@@ -1,0 +1,336 @@
+//===============================================
+// Author: 		Chen Yun-Ru
+// Filename:	cache_props.sva
+// Description: Assumptions/Assertions for cache
+// Version:		0.1
+//===============================================
+
+`include "def.svh"
+
+module cache_props(
+	input clk,
+	input rst,
+	//Core to cache
+	input [`DATA_BITS-1:0] core_addr,
+	input core_req,
+	input core_write,
+	input [`DATA_BITS-1:0] core_in,
+	input [`CACHE_TYPE_BITS-1:0] core_type,
+	//Cache to core
+	input [`DATA_BITS-1:0] core_out,
+	input core_wait,
+	//Cache to CPU wrapper
+	input D_req,
+	input [`DATA_BITS-1:0] D_addr,
+	input D_write,
+	input [`DATA_BITS-1:0] D_in,
+	input [`CACHE_TYPE_BITS-1:0] D_type,
+	//CPU wrapper to cache
+	input [`DATA_BITS-1:0] D_out,
+	input D_wait
+);
+
+	//glue logics
+	logic array_CS;
+	logic array_OE;
+	logic [`CACHE_WRITE_BITS-1:0] DA_WEB;
+	logic [`CACHE_INDEX_BITS-1:0] DA_A;
+	logic [`CACHE_DATA_BITS-1:0] DA_DI;
+	logic [`CACHE_DATA_BITS-1:0] DA_DO;
+	logic TA_WEB;
+	logic [`CACHE_INDEX_BITS-1:0] TA_A;
+	logic [`CACHE_TAG_BITS-1:0] TA_DI;
+	logic [`CACHE_TAG_BITS-1:0] TA_DO;	
+	logic [1:0] byte_sel;
+	logic [`CACHE_BLOCK_BITS-1:0] block_sel;
+	logic [`CACHE_INDEX_BITS-1:0] index;
+	logic [`CACHE_TAG_BITS-1:0] tag;
+	logic read_hit, read_miss, write_hit, write_miss;
+	logic [`CACHE_LINES-1:0] valid_bits;
+	logic latched_D_req, latched_core_req;
+	logic [`DATA_BITS-1:0] golden_data;
+	
+	assign array_CS = 1'b1;
+	assign array_OE = 1'b1;
+	assign byte_sel = core_addr[1:0];
+	assign block_sel = core_addr[3:2];
+	assign index = core_addr[9:4];
+	assign tag = core_addr[31:10];
+	
+	always_ff@(posedge clk or posedge rst)
+	begin
+		if(rst)
+		begin
+			for(int i=0; i<`CACHE_LINES; i++)
+				valid_bits[i] <= 0;
+		end
+		else if(core_req && latched_core_req && read_miss)
+			valid_bits[index] <= 1;
+		else;
+	end
+	
+	//Tag array
+	always_comb
+	begin
+		if(core_req && latched_core_req && read_miss) 
+			TA_WEB = 0;
+		else
+			TA_WEB = 1;
+	end
+	
+	assign TA_A = index;
+	assign TA_DI = tag;
+
+	
+	always_ff@(posedge clk or posedge rst)
+	begin
+		if(rst)
+			latched_core_req <= 0;
+		else
+			latched_core_req <= core_req;
+	end
+	
+	always_comb
+	begin
+		if(core_req && core_wait && !core_write)
+		begin
+			if(valid_bits[index] && (TA_DO==tag))
+			begin
+				read_hit = 1;
+				read_miss = 0;
+			end
+			else
+			begin
+				read_hit = 0;
+				read_miss = 1;
+			end
+		end
+		else
+		begin
+			read_hit = 0;
+			read_miss = 0;
+		end
+	end
+	
+	always_comb
+	begin
+		if(core_req && core_wait && core_write)
+		begin
+			if(valid_bits[index] && (TA_DO==tag))
+			begin
+				write_hit = 1;
+				write_miss = 0;
+			end
+			else
+			begin
+				write_hit = 0;
+				write_miss = 1;
+			end
+		end
+		else
+		begin
+			write_hit = 0;
+			write_miss = 0;
+		end
+	end	
+	
+	
+	//assumptions	
+	//Description: During core wait, the core_addr should be stable
+	core_addr_stable: assume property(
+		@(posedge clk) disable iff(rst)
+		core_wait |-> $stable(core_addr)
+	);	
+	
+	//Description: During core wait, the core_write should be stable
+	core_write_stable: assume property(
+		@(posedge clk) disable iff(rst)
+		core_wait |-> $stable(core_write)
+	);	
+	
+	//Description: During core wait, the core_in should be stable
+	core_in_stable: assume property(
+		@(posedge clk) disable iff(rst)
+		core_wait |-> $stable(core_in)
+	);		
+	
+	//Description: During core wait, the core_type should be stable
+	core_type_stable: assume property(
+		@(posedge clk) disable iff(rst)
+		core_wait |-> $stable(core_type)
+	);	
+	
+	//Description: core_wait will rise when cache receive core request, during core
+	//wait, the core_req should remain stable 
+	core_req_no_fall: assume property(
+		@(posedge clk) disable iff(rst)
+		core_wait |-> core_req
+	);	
+	
+	//Description: D_wait will rise only when D_req rise
+	D_wait_when_D_req: assume property(
+		@(posedge clk) disable iff(rst)
+		!(D_wait && !D_req)
+	);
+	
+	//Description: D_wait may remain high some cycles according to bus and memory delay
+	D_wait_time: assume property( 
+		@(posedge clk) disable iff(rst)
+		(D_req && $past(D_wait)==1'b0) |-> (D_wait ##[2:4] !D_wait)
+	);	
+	
+	//Description: There are 5 kinds of core_type
+	core_type_kind: assume property(
+		@(posedge clk) disable iff(rst)
+		(core_type==`CACHE_BYTE) || (core_type==`CACHE_HWORD) || (core_type==`CACHE_WORD) ||
+		(core_type==`CACHE_BYTE_U) || (core_type==`CACHE_HWORD_U)
+	);	
+	
+	//Description: When core_type=WORD, core_addr should align with word
+	core_addr_word_align: assume property(
+		@(posedge clk) disable iff(rst)
+		(core_type[1:0]==`WORD) |-> (core_addr[1:0]==2'b00)
+	);
+
+	//Description: When core_type=HWORD, core_addr should align with half-word
+	core_addr_hword_align: assume property(
+		@(posedge clk) disable iff(rst)
+		(core_type[1:0]==`HWORD) |-> (core_addr[0]==1'b0)
+	);	
+	
+	//Description: core_write can not rise if no core request
+	core_write_when_req: assume property(
+		@(posedge clk) disable iff(rst)
+		!(core_write && !core_req)
+	);
+	
+	//assertions
+	//Description: D_addr align with word
+	D_addr_word_align: assert property(
+		@(posedge clk) disable iff(rst)
+		(D_req && (D_type[1:0]==`WORD)) |-> (D_addr[1:0]==2'b00)
+	);
+	
+	//Description: D_addr align with half-word
+	D_addr_hword_align: assert property(
+		@(posedge clk) disable iff(rst)
+		(D_req && D_type[1:0]==`HWORD) |-> (D_addr[0]==1'b0)
+	);	
+	
+	//Description:  D_type should be the same as core_type when D_write
+	D_type_equal_core_type: assert property(
+		@(posedge clk) disable iff(rst)
+		D_write |-> (D_type==core_type)
+	);	
+
+	//Description: When write data to SRAM, the D_addr should be the same as core_addr 
+	D_addr_w_equal_core_addr: assert property(
+		@(posedge clk) disable iff(rst)
+		D_write |-> (D_addr==core_addr)
+	);	
+
+	//Description: When write data to SRAM, the D_in should be the same as core_in
+	D_in_equal_core_in: assert property(
+		@(posedge clk) disable iff(rst)
+		D_write |-> (D_in==core_in)
+	);		
+		
+	//Description: Check read_hit happen
+	cache_read_hit: cover property(
+		@(posedge clk) disable iff(rst)
+		(!latched_core_req && core_req  ##1 read_hit) |-> (!D_req)[*2]
+	);
+	
+	//Description: Check read_miss happen
+	cache_read_miss: cover property(
+		@(posedge clk) disable iff(rst)
+		(!latched_core_req && core_req  ##1 read_miss) |-> ##[0:$] D_req
+	);
+	
+	//Description: Check write_hit happen
+	cache_write_hit: cover property(
+		@(posedge clk) disable iff(rst)
+		(!latched_core_req && core_req  ##1 write_hit) |-> ##[0:$] D_req
+	);
+
+	//Description: Check write_miss happen
+	cache_write_miss: cover property(
+		@(posedge clk) disable iff(rst)
+		(!latched_core_req && core_req  ##1 write_miss) |-> ##[0:$] D_req
+	);		
+	
+	//Description: When D_wait, the D_req signal should remain high
+	D_req_no_fall: assert property(
+		@(posedge clk) disable iff(rst)
+		D_wait |-> D_req
+	);
+
+	//Description: If no core_req, D_req should not be high
+	D_req_no_rise: assert property(
+		@(posedge clk) disable iff(rst)
+		!core_req |-> !D_req
+	);	
+	
+	//Description: If no core_write, D_write can't rise
+	D_write_no_rise: assert property(
+		@(posedge clk) disable iff(rst)
+		!core_write |-> !D_write
+	);
+
+	//Description: If D_req to write memory, D_write must rise
+	D_write_rise: assert property(
+		@(posedge clk) disable iff(rst)
+		//(D_req && core_write) |-> ##[0:4] D_write
+		(D_req && core_write) |-> ##[0:$] D_write
+	);
+
+	//Description: If there is no core request, core_wait should not be high
+	core_wait_no_rise: assert property(
+		@(posedge clk) disable iff(rst)
+		!core_req |-> !core_wait
+	);
+	
+	//Description: When core_req, core_wait need to rise
+	core_wait_rise: assert property(
+		@(posedge clk) disable iff(rst)
+		//(core_req && $past(core_req)==1'b0) |-> ##[0:1] core_wait
+		(core_req && $past(core_req)==1'b0) |-> ##[0:$] core_wait
+	);
+	
+	//Description: When D_wait is high, core_wait should also be high
+	core_wait_no_fall: assert property(
+		@(posedge clk) disable iff(rst)
+		D_wait |-> core_wait
+	);		
+	
+	tag_array_wrapper tag_array_u1(
+		.CK(clk),
+		.CS(array_CS),
+		.OE(array_OE),
+		.WEB(TA_WEB),
+		.A(TA_A),
+		.DI(TA_DI),
+		.DO(TA_DO)
+	);
+	
+endmodule
+
+bind L1C_data cache_props cache_props_u1( 
+	.clk(clk),
+	.rst(rst),
+	.core_addr(core_addr),
+	.core_req(core_req),
+	.core_write(core_write),
+	.core_in(core_in),
+	.core_type(core_type),
+	.core_out(core_out),
+	.core_wait(core_wait),
+	.D_req(D_req),
+	.D_addr(D_addr),
+	.D_write(D_write),
+	.D_in(D_in),
+	.D_type(D_type),
+	.D_out(D_out),
+	.D_wait(D_wait)
+); //connect SVA module ports with DUT module ports
+
