@@ -5,14 +5,14 @@ module mem_wb_reg(
     output logic [`log_reg_num-1:0] rd_out,
     output logic wb_memtoreg_out,
     output logic wb_regwrite_out,
-    output logic ls_word_out,
+    output logic [2:0]ls_word_out,
     output logic [`data_size-1:0]mem_out,
 
     input [`data_size-1:0] result_in,
     input [`log_reg_num-1:0] rd_in,
     input wb_memtoreg_in,
     input wb_regwrite_in,
-    input ls_word_in,
+    input [2:0]ls_word_in,
     input [`data_size-1:0]mem_in,
 
     input stall,
@@ -27,7 +27,7 @@ always_ff @(posedge clk or posedge rst)begin
         rd_out              <= 5'b0;
         wb_memtoreg_out     <= 1'b0;
         wb_regwrite_out     <= 1'b0;
-        ls_word_out         <= 1'b0;
+        ls_word_out         <= 2'd0;
         mem_out             <= 32'b0;
     end
     else if(stall)begin

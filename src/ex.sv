@@ -20,7 +20,7 @@ module EX(
 
     output [1:0] r1_forwarding_signal,
     output [1:0] r2_forwarding_signal,
-    output ls_word,
+    output [2:0]ls_word,
 
     input   wb_memtoreg_in,
     input   wb_regwrite_in,
@@ -59,7 +59,7 @@ logic [`data_size-1:0]result0, data1_0, data2_0, data2_1;
 logic [1:0]mux0_select, mux1_select, mux2_select;
 logic [1:0]wb_in,mem_in;
 logic [1:0]mux0_out,mux1_out;
-logic ls_word0;
+logic [2:0]ls_word0;
 
 
 assign wb_in[0]  = wb_memtoreg_in;

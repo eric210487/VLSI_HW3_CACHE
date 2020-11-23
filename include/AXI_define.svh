@@ -54,11 +54,13 @@
 `define ALUAND  4'b1001
 `define ALULUI  4'b1010
 
+//ALUOP
 `define ALUOP_R     2'b10
 `define ALUOP_U     2'b11
 `define ALUOP_I     2'b01
 `define ALUOP_SL     2'b00
 
+//OP code
 `define R_OP        7'b0110011
 `define I_OP        7'b0010011
 `define I_OP_L      7'b0000011
@@ -69,6 +71,7 @@
 `define U_OP_2      7'b0110111
 `define J_OP        7'b1101111
 
+//func3 for branch
 `define FUNC3_BEQ   3'b000
 `define FUNC3_BNE   3'b001
 `define FUNC3_BLT   3'b100
@@ -76,6 +79,14 @@
 `define FUNC3_BLTU  3'b110
 `define FUNC3_BGEU  3'b111
 
+//func3 for Load/Store
+`define FUNC3_W     3'b010
+`define FUNC3_B     3'b000
+`define FUNC3_BU    3'b100
+`define FUNC3_H     3'b001
+`define FUNC3_HU    3'b101
+
+//size of some variable
 `define data_size 32
 `define ins_size 32
 `define pc_size 32

@@ -18,94 +18,57 @@ maxproc			63200
 
 Runtime environment variables:
 INTEL_CVSDK_DIR=/home/eric/intel/openvino_2019.3.376
-GJS_DEBUG_TOPICS=JS ERROR;JS LOG
+MAIL=/var/mail/eric
 USER=eric
 LANGUAGE=en_US:en
-TEXTDOMAIN=im-config
-XDG_SEAT=seat0
-LIBVA_DRIVERS_PATH=/opt/intel/mediasdk/lib64
-XDG_SESSION_TYPE=x11
-SSH_AGENT_PID=2748
-GIT_ASKPASS=/snap/code/50/usr/share/code/resources/app/extensions/git/dist/askpass.sh
+SSH_CLIENT=192.168.164.253 60406 22
+GIT_ASKPASS=/home/eric/.vscode-server/bin/e5a624b788d92b8d34d1392e4c4d9789406efe8f/extensions/git/dist/askpass.sh
+USES_VSCODE_SERVER_SPAWN=true
 LD_LIBRARY_PATH=/home/eric/intel/openvino_2019.3.376/opencv/lib:/opt/intel/opencl:/home/eric/intel/openvino_2019.3.376/deployment_tools/inference_engine/external/hddl/lib:/home/eric/intel/openvino_2019.3.376/deployment_tools/inference_engine/external/gna/lib:/home/eric/intel/openvino_2019.3.376/deployment_tools/inference_engine/external/mkltiny_lnx/lib:/home/eric/intel/openvino_2019.3.376/deployment_tools/inference_engine/external/tbb/lib:/home/eric/intel/openvino_2019.3.376/deployment_tools/inference_engine/lib/intel64:/home/eric/intel/openvino_2019.3.376/openvx/lib:/usr/local/systemc-2.3.3/lib-linux64:/opt/CIC/Synopsys/dc/synthesis/2019.12/lib/linux64:/opt/CIC/Synopsys/verdi/2018.09/share/PLI/IUS/linux64:/home/eric/intel/openvino_2019.3.376/opencv/lib:/opt/intel/opencl:/home/eric/intel/openvino_2019.3.376/deployment_tools/inference_engine/external/hddl/lib:/home/eric/intel/openvino_2019.3.376/deployment_tools/inference_engine/external/gna/lib:/home/eric/intel/openvino_2019.3.376/deployment_tools/inference_engine/external/mkltiny_lnx/lib:/home/eric/intel/openvino_2019.3.376/deployment_tools/inference_engine/external/tbb/lib:/home/eric/intel/openvino_2019.3.376/deployment_tools/inference_engine/lib/intel64:/home/eric/intel/openvino_2019.3.376/openvx/lib:/usr/local/systemc-2.3.3/lib-linux64:
-SHLVL=1
+SHLVL=3
 HDDL_INSTALL_DIR=/home/eric/intel/openvino_2019.3.376/deployment_tools/inference_engine/external/hddl
 HOME=/home/eric
 LESS=-R
 OLDPWD=/home/eric/Documents/VLSI/Hw3/N26091530
-QT4_IM_MODULE=xim
-CHROME_DESKTOP=code-url-handler.desktop
-DESKTOP_SESSION=ubuntu
+VSCODE_IPC_HOOK_CLI=/run/user/1000/vscode-ipc-8e96c365-e7c7-47a0-a9b4-cb9949891ca3.sock
 TERM_PROGRAM_VERSION=1.51.1
 LSCOLORS=Gxfxcxdxbxegedabagacad
 VTA_RPC_HOST=pynq
 ZSH=/home/eric/.oh-my-zsh
-GIO_LAUNCHED_DESKTOP_FILE=/var/lib/snapd/desktop/applications/code_code.desktop
-VSCODE_GIT_ASKPASS_MAIN=/snap/code/50/usr/share/code/resources/app/extensions/git/dist/askpass-main.js
+VSCODE_GIT_ASKPASS_MAIN=/home/eric/.vscode-server/bin/e5a624b788d92b8d34d1392e4c4d9789406efe8f/extensions/git/dist/askpass-main.js
 INTEL_OPENVINO_DIR=/home/eric/intel/openvino_2019.3.376
-GTK_MODULES=gail:atk-bridge
-APPLICATION_INSIGHTS_NO_DIAGNOSTIC_CHANNEL=true
-GNOME_SHELL_SESSION_MODE=ubuntu
 PAGER=less
-VSCODE_GIT_ASKPASS_NODE=/snap/code/50/usr/share/code/code
+VSCODE_GIT_ASKPASS_NODE=/home/eric/.vscode-server/bin/e5a624b788d92b8d34d1392e4c4d9789406efe8f/node
 SYSTEMC_HOME=/usr/local/systemc-2.3.3
 DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/1000/bus
 MAKEFLAGS=
-GIO_LAUNCHED_DESKTOP_FILE_PID=10270
 COLORTERM=truecolor
+PIPE_LOGGING=true
 FNP_IP_ENV=1
-MAKE_TERMERR=/dev/pts/0
-IM_CONFIG_PHASE=2
-MANDATORY_PATH=/usr/share/gconf/ubuntu.mandatory.path
+MAKE_TERMERR=/dev/pts/2
 VTA_RPC_PORT=9091
-GTK_IM_MODULE=ibus
 LOGNAME=eric
 _=/usr/bin/make
-DEFAULTS_PATH=/usr/share/gconf/ubuntu.default.path
-USERNAME=eric
-XDG_SESSION_ID=2
+XDG_SESSION_ID=340
 TERM=xterm-256color
-GNOME_DESKTOP_SESSION_ID=this-is-deprecated
-WINDOWPATH=2
-PATH=/home/eric/intel/openvino_2019.3.376/deployment_tools/model_optimizer:/opt/CIC/Synopsys/dc/synthesis/2019.12/bin:/opt/CIC/Synopsys/verdi/2018.09/bin:/opt/CIC/Cadence/INCISIV/INCISIVE_15.20.039/tools.lnx86/bin/64bit:/home/eric/intel/openvino_2019.3.376/deployment_tools/model_optimizer:/home/eric/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:/opt/riscv/bin:/opt/riscv/bin
-SESSION_MANAGER=local/erics-linux:@/tmp/.ICE-unix/2670,unix/erics-linux:/tmp/.ICE-unix/2670
+PATH=/home/eric/intel/openvino_2019.3.376/deployment_tools/model_optimizer:/home/eric/.vscode-server/bin/e5a624b788d92b8d34d1392e4c4d9789406efe8f/bin:/opt/CIC/Synopsys/dc/synthesis/2019.12/bin:/opt/CIC/Synopsys/verdi/2018.09/bin:/opt/CIC/Cadence/INCISIV/INCISIVE_15.20.039/tools.lnx86/bin/64bit:/home/eric/intel/openvino_2019.3.376/deployment_tools/model_optimizer:/home/eric/.vscode-server/bin/e5a624b788d92b8d34d1392e4c4d9789406efe8f/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/opt/riscv/bin:/opt/riscv/bin
 LM_LICENSE_FILE=26585@lsncku:5280@lsncku
-XDG_RUNTIME_DIR=/run/user/1000/snap.code
-XDG_MENU_PREFIX=gnome-
-BAMF_DESKTOP_FILE_HINT=/var/lib/snapd/desktop/applications/code_code.desktop
+XDG_RUNTIME_DIR=/run/user/1000
 MAKELEVEL=1
-DISPLAY=:0
-XDG_CURRENT_DESKTOP=Unity
 LANG=en_US.UTF-8
-XAUTHORITY=/run/user/1000/gdm/Xauthority
-XMODIFIERS=@im=ibus
 LS_COLORS=rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=00:su=37;41:sg=30;43:ca=30;41:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arc=01;31:*.arj=01;31:*.taz=01;31:*.lha=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.tzo=01;31:*.t7z=01;31:*.zip=01;31:*.z=01;31:*.Z=01;31:*.dz=01;31:*.gz=01;31:*.lrz=01;31:*.lz=01;31:*.lzo=01;31:*.xz=01;31:*.zst=01;31:*.tzst=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.alz=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.cab=01;31:*.wim=01;31:*.swm=01;31:*.dwm=01;31:*.esd=01;31:*.jpg=01;35:*.jpeg=01;35:*.mjpg=01;35:*.mjpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=00;36:*.au=00;36:*.flac=00;36:*.m4a=00;36:*.mid=00;36:*.midi=00;36:*.mka=00;36:*.mp3=00;36:*.mpc=00;36:*.ogg=00;36:*.ra=00;36:*.wav=00;36:*.oga=00;36:*.opus=00;36:*.spx=00;36:*.xspf=00;36:
-XDG_SESSION_DESKTOP=ubuntu
-VSCODE_GIT_IPC_HANDLE=/run/user/1000/snap.code/vscode-git-10b2eff00a.sock
-LIBVA_DRIVER_NAME=iHD
+VSCODE_GIT_IPC_HANDLE=/run/user/1000/vscode-git-0a2fe3ac9c.sock
 TERM_PROGRAM=vscode
-GSETTINGS_SCHEMA_DIR=/snap/code/50/usr/share/glib-2.0/schemas
-SSH_AUTH_SOCK=/run/user/1000/keyring/ssh
-ORIGINAL_XDG_CURRENT_DESKTOP=ubuntu:GNOME
 RISCV=/opt/riscv
-MFX_HOME=/opt/intel/mediasdk
 SHELL=/bin/zsh
-DISABLE_WAYLAND=1
-GDMSESSION=ubuntu
-MAKE_TERMOUT=/dev/pts/0
-QT_ACCESSIBILITY=1
+VERBOSE_LOGGING=true
+MAKE_TERMOUT=/dev/pts/2
 OpenCV_DIR=/home/eric/intel/openvino_2019.3.376/opencv/cmake
-GPG_AGENT_INFO=/run/user/1000/gnupg/S.gpg-agent:0:1
 InferenceEngine_DIR=/home/eric/intel/openvino_2019.3.376/deployment_tools/inference_engine/share
-TEXTDOMAINDIR=/usr/share/locale/
-GJS_DEBUG_OUTPUT=stderr
-XDG_VTNR=2
-QT_IM_MODULE=ibus
 PWD=/home/eric/Documents/VLSI/Hw3/N26091530/build
 TVM_HOME=/home/eric/tvm
-XDG_CONFIG_DIRS=/etc/xdg/xdg-ubuntu:/etc/xdg
-XDG_DATA_DIRS=/usr/share/ubuntu:/usr/local/share/:/usr/share/:/var/lib/snapd/desktop
-CLUTTER_IM_MODULE=xim
+SSH_CONNECTION=192.168.164.253 60406 192.168.164.170 22
+AMD_ENTRYPOINT=vs/server/remoteExtensionHostProcess
 PYTHONPATH=/home/eric/tvm/python:/home/eric/tvm/topi/python:/home/eric/tvm/vta/python:/home/eric/intel/openvino_2019.3.376/python/python3.6:/home/eric/intel/openvino_2019.3.376/python/python3:/home/eric/intel/openvino_2019.3.376/deployment_tools/open_model_zoo/tools/accuracy_checker:/home/eric/intel/openvino_2019.3.376/deployment_tools/model_optimizer:/home/eric/tvm/python:/home/eric/tvm/topi/python:/home/eric/tvm/vta/python:/home/eric/intel/openvino_2019.3.376/python/python3.6:/home/eric/intel/openvino_2019.3.376/python/python3:/home/eric/intel/openvino_2019.3.376/deployment_tools/open_model_zoo/tools/accuracy_checker:/home/eric/intel/openvino_2019.3.376/deployment_tools/model_optimizer:
 MFLAGS=
 VTA_HW_PATH=/home/eric/tvm/3rdparty/vta-hw
@@ -126,14 +89,14 @@ argv[6]=-define
 argv[7]=MAX=6000000
 argv[8]=+access+r
 argv[9]=+prog_path=/home/eric/Documents/VLSI/Hw3/N26091530/./sim/prog0
-128 profile - 100
-          CPU/Mem usage: 0.020 sys,  0.040 user,  163.51M sys,  0.00M vm
-129 VC callback profile - scalar:0 vector:0
-130 Fri Nov 20 18:46:21 2020
-131 pliAppInit
-132 FSDB_GATE is disabled.
-133 Enable Parallel Dumping.
-134 pliAppMiscSet: New Sim Round
-135 pliEntryInit
-136 LIBSSCORE=found /opt/CIC/Synopsys/verdi/2018.09/share/PLI/IUS/linux64/libsscore_ius152.so through $LD_LIBRARY_PATH setting.
-137 Sim process exit
+91 profile - 100
+          CPU/Mem usage: 0.050 sys,  0.040 user,  163.50M sys,  0.00M vm
+92 VC callback profile - scalar:0 vector:0
+93 Mon Nov 23 12:18:34 2020
+94 pliAppInit
+95 FSDB_GATE is disabled.
+96 Enable Parallel Dumping.
+97 pliAppMiscSet: New Sim Round
+98 pliEntryInit
+99 LIBSSCORE=found /opt/CIC/Synopsys/verdi/2018.09/share/PLI/IUS/linux64/libsscore_ius152.so through $LD_LIBRARY_PATH setting.
+100 Sim process exit

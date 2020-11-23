@@ -3,12 +3,12 @@
 `include "../include/AXI_define.svh"
 module alu_control(
     output logic[3:0]out,
-    output ls_word,
+    output [2:0]ls_word,
     input  [1:0]aluop,
     input  [3:0]ins_30_14_12
 );
 
-assign ls_word = ins_30_14_12[1];
+assign ls_word = ins_30_14_12[2:0];
 
 always_comb begin
     case (aluop)

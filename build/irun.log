@@ -1,5 +1,5 @@
 irun(64): 15.20-s039: (c) Copyright 1995-2017 Cadence Design Systems, Inc.
-TOOL:	irun(64)	15.20-s039: Started on Nov 20, 2020 at 18:46:18 CST
+TOOL:	irun(64)	15.20-s039: Started on Nov 23, 2020 at 12:18:31 CST
 irun
 	/home/eric/Documents/VLSI/Hw3/N26091530/./sim/top_tb.sv
 	+incdir+/home/eric/Documents/VLSI/Hw3/N26091530/./src+/home/eric/Documents/VLSI/Hw3/N26091530/./src/AXI+/home/eric/Documents/VLSI/Hw3/N26091530/./include+/home/eric/Documents/VLSI/Hw3/N26091530/./sim
@@ -12,45 +12,6 @@ irun
    User defined plus("+") options:
 	+prog_path=/home/eric/Documents/VLSI/Hw3/N26091530/./sim/prog0
 
-file: /home/eric/Documents/VLSI/Hw3/N26091530/./sim/top_tb.sv
-`define CYCLE 8.0 // Cycle time
-                               |
-ncvlog: *W,MACNDF (/home/eric/Documents/VLSI/Hw3/N26091530/./sim/top_tb.sv,2|31): The text macro 'CYCLE' has also been defined on the command line using the -DEFINE command line option.  The compiler will ignore the definition found in the Verilog source code.
-`define MAX 300000 // Max cycle number
-                                      |
-ncvlog: *W,MACNDF (/home/eric/Documents/VLSI/Hw3/N26091530/./sim/top_tb.sv,3|38): The text macro 'MAX' has also been defined on the command line using the -DEFINE command line option.  The compiler will ignore the definition found in the Verilog source code.
-    $value$plusargs("prog_path=%s", prog_path);
-                  |
-ncvlog: *W,NOSYST (/home/eric/Documents/VLSI/Hw3/N26091530/./sim/top_tb.sv,56|18): System function '$value$plusargs' invoked as a task. Return value will be ignored.
-      $fscanf(gf, "%h\n", GOLDEN[num]);
-            |
-ncvlog: *W,NOSYST (/home/eric/Documents/VLSI/Hw3/N26091530/./sim/top_tb.sv,78|12): System function '$fscanf' invoked as a task. Return value will be ignored.
-ncvlog: *W,SPDUSD: Include directory /home/eric/Documents/VLSI/Hw3/N26091530/./include given but not used.
-	Total errors/warnings found outside modules and primitives:
-		errors: 0, warnings: 3
-		Caching library 'worklib' ....... Done
-	Elaborating the design hierarchy:
-	Top level design units:
-		shift_left
-		data_array
-		tag_array
-		top_tb
-ncelab: *W,DSEMEL: This SystemVerilog design will be simulated as per IEEE 1800-2009 SystemVerilog simulation semantics. Use -disable_sem2009 option for turning off SV 2009 simulation semantics.
-	Building instance overlay tables: .................... Done
-	Building instance specific data structures.
-	Loading native compiled code:     .................... Done
-	Design hierarchy summary:
-		                  Instances  Unique
-		Modules:                 53      47
-		Registers:              539     506
-		Scalar wires:           932       -
-		Vectored wires:         360       -
-		Always blocks:           62      55
-		Initial blocks:           2       2
-		Cont. assignments:      159     428
-		Pseudo assignments:     370     338
-		Simulation timescale:  10ps
-	Writing initial simulation snapshot: worklib.shift_left:sv
 Loading snapshot worklib.shift_left:sv .................... Done
 ncsim: *W,DSEM2009: This SystemVerilog design is simulated as per IEEE 1800-2009 SystemVerilog simulation semantics. Use -disable_sem2009 option for turning off SV 2009 simulation semantics.
 *Verdi* Loading libsscore_ius152.so
@@ -71,9 +32,9 @@ DM[   8] = fefcfefd, pass
 DM[   9] = 10305070, pass
 DM[  10] = cccccccc, pass
 DM[  11] = ffffffcc, pass
-DM[  12] = ffffffcc, expect = ffffcccc
-DM[  13] = ffffffcc, expect = 000000cc
-DM[  14] = ffffffcc, expect = 0000cccc
+DM[  12] = ffffcccc, pass
+DM[  13] = 000000cc, pass
+DM[  14] = 0000cccc, pass
 DM[  15] = 00000d9d, pass
 DM[  16] = 00000004, pass
 DM[  17] = 00000003, pass
@@ -89,12 +50,12 @@ DM[  26] = 0000f000, pass
 DM[  27] = 00000f00, pass
 DM[  28] = 000000f0, pass
 DM[  29] = 0000000f, pass
-DM[  30] = 00780000, expect = 56780000
+DM[  30] = 56780000, pass
 DM[  31] = 78000000, pass
-DM[  32] = 00000078, expect = 00005678
+DM[  32] = 00005678, pass
 DM[  33] = 00000078, pass
 DM[  34] = 12345678, pass
-DM[  35] = 78780000, expect = ce780000
+DM[  35] = ce780000, pass
 DM[  36] = fffff000, pass
 DM[  37] = fffff000, pass
 DM[  38] = fffff000, pass
@@ -110,15 +71,14 @@ DM[  44] = fffff004, pass
 
         ****************************               
         **                        **       |__||  
-        **  OOPS!!                **      / X,X  | 
+        **  Congratulations !!    **      / O.O  | 
         **                        **    /_____   | 
-        **  Simulation Failed!!   **   /^ ^ ^ \  |
+        **  Simulation PASS!!     **   /^ ^ ^ \  |
         **                        **  |^ ^ ^ ^ |w| 
         ****************************   \m___m__|_|
-         Totally has           6 errors                     
 
 
 Simulation complete via $finish(1) at time 366835 NS + 2
 ../sim/top_tb.sv:113     $finish;
 ncsim> exit
-TOOL:	irun(64)	15.20-s039: Exiting on Nov 20, 2020 at 18:46:21 CST  (total: 00:00:03)
+TOOL:	irun(64)	15.20-s039: Exiting on Nov 23, 2020 at 12:18:34 CST  (total: 00:00:03)

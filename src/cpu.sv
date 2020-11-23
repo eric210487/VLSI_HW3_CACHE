@@ -61,7 +61,7 @@ logic [`log_reg_num-1:0]rd_1;
 logic memtoreg_1, regwrite_1;
 logic [`data_size-1:0]zero;
 logic [1:0] r1_forwarding_signal, r2_forwarding_signal;
-logic lsword0;
+logic [2:0]lsword0;
 logic ex_mem_memread0;
 logic [`data_size-1:0]data2_to_control;
 //mem out
@@ -69,7 +69,7 @@ logic [`data_size-1:0]result_0;
 logic memtoreg_0, regwrite_0;
 logic [`log_reg_num-1:0]rd_0;
 logic memwrite_0;
-logic lsword1;
+logic [2:0]lsword1;
 logic [`data_size-1:0] d_do_out;
 //wb out
 logic [`data_size-1:0]wb_data;
@@ -209,6 +209,7 @@ mem_wb_reg memwbreg0(
 wb_converter wbconverter0(
     .out(convertdo),
     .in(d_do_out),
+    .address_byte(result_0[1:0]),
     .w_b(lsword1)
 );
 wb_mux wbmux0(
