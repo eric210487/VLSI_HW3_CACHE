@@ -1,0 +1,31 @@
+//
+// File created by:  irun
+// Do not modify this file
+//
+-XLMODE
+./INCA_libs/irun.lnx8664.15.20.nc
+-RUNMODE
+/home/eric/Documents/VLSI/Hw3/N26091530/./sim/top_tb.sv
+-INCDIR
+/home/eric/Documents/VLSI/Hw3/N26091530/./src
+-INCDIR
+/home/eric/Documents/VLSI/Hw3/N26091530/./src/AXI
+-INCDIR
+/home/eric/Documents/VLSI/Hw3/N26091530/./include
+-INCDIR
+/home/eric/Documents/VLSI/Hw3/N26091530/./sim
+-DEFINE
+prog0
+-DEFINE
+CYCLE=10.0
+-DEFINE
+MAX=6000000
+-CDSLIB
+./INCA_libs/irun.lnx8664.15.20.nc/cdsrun.lib
+-HDLVAR
+./INCA_libs/irun.lnx8664.15.20.nc/hdlrun.var
+-MESSAGES
+-UPDATE
+-XLLIBSTORE
+./INCA_libs/irun.lnx8664.15.20.nc/xllibs
+-ALLOWUNBOUND

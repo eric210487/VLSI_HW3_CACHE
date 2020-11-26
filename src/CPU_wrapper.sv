@@ -1,4 +1,5 @@
 `include "../include/AXI_define.svh"
+`include "../include/def.svh"
 `include "cpu.sv"
 module cpu_wrapper(
     //READ ADDRESS0
@@ -58,13 +59,13 @@ module cpu_wrapper(
 );
 
 //cpu output
-	logic i_cs;
+	//logic i_cs;
 	logic i_oe;
-	logic [3:0]i_web;
+	//logic [3:0]i_web;
 	logic [31:0]i_address;
-	logic [`data_size-1:0]i_di;
+	//logic [`data_size-1:0]i_di;
 
-	logic d_cs;
+	//logic d_cs;
 	logic d_oe;
 	logic [3:0]d_web;
 	logic [31:0]d_address;
@@ -74,29 +75,45 @@ module cpu_wrapper(
 	logic [`data_size-1:0]d_do;
 	logic i_stall;
 	logic d_stall;
+// d_cache input from cpu
+	logic d_core_req;
+	logic d_core_write;
+	logic [`CACHE_TYPE_BITS-1:0]d_core_type;
+// d_cache output to cpu
+	logic [`DATA_BITS-1:0]d_core_out;
+	logic d_core_wait;
+
+// other logic
+	logic d_web_bit;
+	logic [1:0]web_sum;
+
+
 
 cpu cpu0(
-	.i_cs(i_cs),
-	.i_oe(i_oe),
-	.i_web(i_web),
+	//output---------------------------
+	//.i_cs(i_cs),
+	.i_oe(i_oe),				
+	//.i_web(i_web),
 	.i_address(i_address),
-	.i_di(i_di),
+	//.i_di(i_di),
 
-	.d_cs(d_cs),
-	.d_oe(d_oe),
-	.d_web(d_web),
-	.d_address(d_address),
-	.d_di(d_di),
+	//.d_cs(d_cs),
+	.d_oe(d_oe),				//-> tell cache that cpu want to read data
+	.d_web(d_web),				//-> tell cache that cpu want to write data
+	.d_address(d_address),		//-> give cache address
+	.d_di(d_di),				//-> data input to cache
 
-	.i_do(i_do),
-	.d_do(d_do),
+	//input-----------------------------
+	.i_do(i_do),								
+	.d_do(d_do),				//<- data output from cache
 
 	.i_stall(i_stall),
-	.d_stall(d_stall),
+	.d_stall(d_stall),			//<- stall signal from cache
 
 	.clk(clk),
 	.rst(rst)
 );
+
 L1C_inst inst_c(
 	.clk(clk),
 	.rst(rst),
@@ -118,15 +135,15 @@ L1C_inst inst_c(
 L1C_data data_c(
 	.clk(clk),
 	.rst(rst),
-	.core_addr(),
-	.core_req(),
-	.core_write(),
-	.core_in(),
-	.core_type(),
+	.core_addr(d_address),				//<- get the address from cpu
+	.core_req(d_core_req),				//<- cpu tell cache run
+	.core_write(d_core_write),			//<- cpu tell cache write or read (1:read/2:write)
+	.core_in(d_di),				//<- cpu give the write data to cache
+	.core_type(d_core_type),			//<- cpu write/read data type
 	.D_out(),
 	.D_wait(),
-	.core_out(),
-	.core_wait(),
+	.core_out(d_core_out),				//-> cache output the data to cpu
+	.core_wait(d_core_wait),			//-> cache tell cpu to stall
 	.D_req(),
 	.D_addr(),
 	.D_write(),
@@ -134,18 +151,28 @@ L1C_data data_c(
 	.D_type()
 );
 
+// ----------------assign---------------
+
+assign d_core_req = (d_oe|d_web_bit)?1'b1:1'b0;
+assign d_core_write = d_oe;
 
 
-logic d_web_bit;
 
 always_comb begin
 	if(d_web==4'b1111) d_web_bit = 1'b0;
 	else d_web_bit = 1'b1;
 end
 
+always_comb begin
+	web_sum = d_web[0] + d_web[1] + d_web[2] + d_web[3];
+	case (web_sum)
+		2'd0: d_core_type = `CACHE_WORD
+	endcase
+end
+
 
 assign i_stall = (~RVALID_M0) & i_oe;
-assign d_stall = ((~RVALID_M1) & d_oe) | ((~BVALID_M1) & d_web_bit);
+assign d_stall = ((~RVALID_M1) & d_oe) | ((~BVALID_M1) & d_web_bit); //change
 
 
 logic [1:0]M0_state;
@@ -238,13 +265,13 @@ always_ff @(posedge clk, posedge rst) begin
 			`CPU_WRAPPER_RM1_INI: 	begin
 				M1_state <= (d_oe)?`CPU_WRAPPER_RM1_RSEND:((d_web_bit)?`CPU_WRAPPER_RM1_WSEND:`CPU_WRAPPER_RM1_INI);
 				if(d_oe) begin
-					M1_r_addr_reg <= d_address;
+					M1_r_addr_reg <= d_address; //chang to cache gived address
 					M1_w_addr_reg <= 32'b0;
 					M1_w_data_reg <= 32'b0;
 				end
 				else if(d_web_bit) begin
 					M1_r_addr_reg <= 32'b0;
-					M1_w_addr_reg <= d_address;
+					M1_w_addr_reg <= d_address; //chang to cache gived address
 					M1_w_data_reg <= d_di;
 				end
 				else begin

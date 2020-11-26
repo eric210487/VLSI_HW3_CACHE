@@ -11,7 +11,7 @@ module cpu(
     output i_oe,
     //output [3:0]i_web,
     output [31:0]i_address,
-    output [`data_size-1:0]i_di,
+    //output [`data_size-1:0]i_di,
 
     //output d_cs,
     output d_oe,

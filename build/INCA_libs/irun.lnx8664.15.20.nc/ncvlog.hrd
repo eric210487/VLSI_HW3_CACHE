@@ -1,0 +1,18 @@
+//
+// File created by:  irun
+// Do not modify this file
+//
+-INCDIR
+/home/eric/Documents/VLSI/Hw3/N26091530/./src
+-INCDIR
+/home/eric/Documents/VLSI/Hw3/N26091530/./src/AXI
+-INCDIR
+/home/eric/Documents/VLSI/Hw3/N26091530/./include
+-INCDIR
+/home/eric/Documents/VLSI/Hw3/N26091530/./sim
+-DEFINE
+prog0
+-DEFINE
+CYCLE=10.0
+-DEFINE
+MAX=6000000
