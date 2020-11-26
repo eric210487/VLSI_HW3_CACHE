@@ -30,4 +30,14 @@
 `define HWORD `WRITE_LEN_BITS'b01
 `define WORD `WRITE_LEN_BITS'b10
 
+//Cache State
+`define IDLE        3'b000
+`define READ        3'b001
+`define READMISS    3'b010
+`define READDATA    3'b011
+`define WRITE       3'b100
+`define WRITEHIT    3'b101
+`define WRITEMISS   3'b110
+`define WRITEDATA   3'b111
+
 `endif

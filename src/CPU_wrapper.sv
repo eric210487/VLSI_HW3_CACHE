@@ -97,6 +97,44 @@ cpu cpu0(
 	.clk(clk),
 	.rst(rst)
 );
+L1C_inst inst_c(
+	.clk(clk),
+	.rst(rst),
+	.core_addr(),
+	.core_req(),
+	.core_write(),
+	.core_in(),
+	.core_type(),
+	.I_out(),
+	.I_wait(),
+	.core_out(),
+	.core_wait(),
+	.I_req(),
+	.I_addr(),
+	.I_write(),
+	.I_in(),
+	.I_type
+);
+L1C_data data_c(
+	.clk(clk),
+	.rst(rst),
+	.core_addr(),
+	.core_req(),
+	.core_write(),
+	.core_in(),
+	.core_type(),
+	.D_out(),
+	.D_wait(),
+	.core_out(),
+	.core_wait(),
+	.D_req(),
+	.D_addr(),
+	.D_write(),
+	.D_in(),
+	.D_type()
+);
+
+
 
 logic d_web_bit;
 

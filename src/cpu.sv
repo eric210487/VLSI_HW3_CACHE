@@ -7,13 +7,13 @@
 `include "wb_mux.sv"
 `include "wb_converter.sv"
 module cpu(
-    output i_cs,
+    //output i_cs,
     output i_oe,
-    output [3:0]i_web,
+    //output [3:0]i_web,
     output [31:0]i_address,
     output [`data_size-1:0]i_di,
 
-    output d_cs,
+    //output d_cs,
     output d_oe,
     output [3:0]d_web,
     output [31:0]d_address,
@@ -29,10 +29,10 @@ module cpu(
     input  rst
 );
 
-assign i_cs = 1'b1;
-assign d_cs = 1'b1;
-assign i_web = 4'b1111;
-assign i_di = 32'd0;
+//assign i_cs = 1'b1;
+//assign d_cs = 1'b1;
+//assign i_web = 4'b1111;
+//assign i_di = 32'd0;
 assign i_oe = 1'b1;
 
 //if out
