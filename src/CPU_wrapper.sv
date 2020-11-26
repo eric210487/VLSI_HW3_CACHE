@@ -79,9 +79,16 @@ module cpu_wrapper(
 	logic d_core_req;
 	logic d_core_write;
 	logic [`CACHE_TYPE_BITS-1:0]d_core_type;
-// d_cache output to cpu
-	logic [`DATA_BITS-1:0]d_core_out;
-	logic d_core_wait;
+
+// d_cache input from wrapper 
+	logic [`DATA_BITS-1:0]d_d_out;
+	logic d_d_wait;
+// d_cache output to wrapper
+	logic d_d_req;
+	logic [`DATA_BITS-1:0]d_d_addr;
+	logic d_d_write;
+	logic [`DATA_BITS-1:0]d_d_in;
+	logic  [`CACHE_TYPE_BITS-1:0]d_d_type;
 
 // other logic
 	logic d_web_bit;
@@ -135,26 +142,26 @@ L1C_inst inst_c(
 L1C_data data_c(
 	.clk(clk),
 	.rst(rst),
-	.core_addr(d_address),				//<- get the address from cpu
-	.core_req(d_core_req),				//<- cpu tell cache run
-	.core_write(d_core_write),			//<- cpu tell cache write or read (1:read/2:write)
-	.core_in(d_di),				//<- cpu give the write data to cache
-	.core_type(d_core_type),			//<- cpu write/read data type
-	.D_out(),
-	.D_wait(),
-	.core_out(d_core_out),				//-> cache output the data to cpu
-	.core_wait(d_core_wait),			//-> cache tell cpu to stall
-	.D_req(),
-	.D_addr(),
-	.D_write(),
-	.D_in(),
-	.D_type()
+	.core_addr(d_address),			//<- get the address from cpu
+	.core_req(d_core_req),			//<- cpu tell cache run
+	.core_write(d_core_write),		//<- cpu tell cache write or read (0:read/1:write)
+	.core_in(d_di),					//<- cpu give the write data to cache
+	.core_type(d_core_type),		//<- cpu write/read data type
+	.D_out(d_d_out),				//<- data from wrapper *
+	.D_wait(d_d_wait),				//<- wait signal from cpu wrapper *
+	.core_out(d_do),				//-> cache output the data to cpu
+	.core_wait(d_stall),			//-> cache tell cpu to stall
+	.D_req(d_d_req),				//-> request to cpu wrapper *
+	.D_addr(d_d_addr),				//-> addr to cpu wrapper *
+	.D_write(d_d_write),			//-> 1 = write ; 0 = read *
+	.D_in(d_d_in),					//-> data to wrapper *
+	.D_type(d_d_type)				//-> type of data to wrapper *
 );
 
 // ----------------assign---------------
 
 assign d_core_req = (d_oe|d_web_bit)?1'b1:1'b0;
-assign d_core_write = d_oe;
+assign d_core_write = d_web_bit;
 
 
 
@@ -166,13 +173,16 @@ end
 always_comb begin
 	web_sum = d_web[0] + d_web[1] + d_web[2] + d_web[3];
 	case (web_sum)
-		2'd0: d_core_type = `CACHE_WORD
+		2'd0: d_core_type = `CACHE_WORD;
+		2'd1: d_core_type = `CACHE_WORD; //never touch
+		2'd2: d_core_type = `CACHE_HWORD;
+		2'd3: d_core_type = `CACHE_BYTE;
 	endcase
 end
 
 
 assign i_stall = (~RVALID_M0) & i_oe;
-assign d_stall = ((~RVALID_M1) & d_oe) | ((~BVALID_M1) & d_web_bit); //change
+assign d_d_wait = ((~RVALID_M1) & d_d_req) | ((~BVALID_M1) & d_d_req); //change
 
 
 logic [1:0]M0_state;
@@ -198,7 +208,7 @@ end
 always_comb begin
 			ARID_M0		= 1'b0;					//
 			ARADDR_M0	= `AXI_ADDR_BITS'b0;
-			ARLEN_M0		= `AXI_LEN_ONE;		//
+			ARLEN_M0	= `AXI_LEN_ONE;			//
 			ARSIZE_M0	= `AXI_SIZE_WORD;		//
 			ARBURST_M0	= `AXI_BURST_INC;		//
 			ARVALID_M0	= 1'b0;
@@ -312,8 +322,8 @@ always_comb begin
 			ARVALID_M1	= 1'b0;
 			//READ DATA1
 			RREADY_M1	= 1'b1;
-			//CPU
-			d_do		= 32'b0;
+			//cache
+			d_d_out		= 32'b0;
 	case (M1_state)
 		`CPU_WRAPPER_RM1_INI: begin
 			//Write address
@@ -339,8 +349,8 @@ always_comb begin
 			ARVALID_M1	= 1'b0;
 			//READ DATA1
 			RREADY_M1	= 1'b1;
-			//CPU
-			d_do		= 32'b0;
+			//cache
+			d_d_out		= 32'b0;
 
 		end
 		`CPU_WRAPPER_RM1_RSEND: begin
@@ -367,8 +377,8 @@ always_comb begin
 			ARVALID_M1	= 1'b1;
 			//READ DATA
 			RREADY_M1	= 1'b0;
-			//CPU
-			d_do		= 32'b0;
+			//cache
+			d_d_out		= 32'b0;
 		end
 		`CPU_WRAPPER_RM1_RWAIT: begin
 			//Write address
@@ -394,8 +404,8 @@ always_comb begin
 			ARVALID_M1	= 1'b0;
 			//READ DATA
 			RREADY_M1	= 1'b0;
-			//CPU
-			d_do		= RDATA_M1;
+			//cache
+			d_d_out		= RDATA_M1;
 		end
 		`CPU_WRAPPER_RM1_WSEND: begin
 			//Write address
@@ -421,8 +431,8 @@ always_comb begin
 			ARVALID_M1	= 1'b0;
 			//READ DATA1
 			RREADY_M1	= 1'b1;
-			//CPU
-			d_do		= 32'b0;
+			//cache
+			d_d_out		= 32'b0;
 		end
 		`CPU_WRAPPER_RM1_WWAIT: begin
 			//Write address
@@ -448,8 +458,8 @@ always_comb begin
 			ARVALID_M1	= 1'b0;
 			//READ DATA1
 			RREADY_M1	= 1'b1;
-			//CPU
-			d_do		= 32'b0;
+			//cache
+			d_d_out		= 32'b0;
 		end
 		`CPU_WRAPPER_RM1_WREADY: begin
 			//Write address
@@ -475,8 +485,8 @@ always_comb begin
 			ARVALID_M1	= 1'b0;
 			//READ DATA1
 			RREADY_M1	= 1'b1;
-			//CPU
-			d_do		= 32'b0;
+			//cache
+			d_d_out		= 32'b0;
 		end
 	endcase
 end

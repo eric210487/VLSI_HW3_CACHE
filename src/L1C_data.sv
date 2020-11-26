@@ -15,7 +15,7 @@ module L1C_data(
   input [`DATA_BITS-1:0] core_in, //cpu give datas to cache
   input [`CACHE_TYPE_BITS-1:0] core_type, //type of data
   // Mem to CPU wrapper
-  input [`DATA_BITS-1:0] D_out, //mem give read datas to cache
+  input [`DATA_BITS-1:0] D_out, //mem give read data to cache
   input D_wait, //mem tell cache to wait
   // CPU wrapper to core
   output logic [`DATA_BITS-1:0] core_out, //data to cpu
@@ -24,7 +24,7 @@ module L1C_data(
   output logic D_req, //tell wrapper to start
   output logic [`DATA_BITS-1:0] D_addr, //address to wrapper
   output D_write, // 0 = write ; 1 = read 
-  output [`DATA_BITS-1:0] D_in, // datas to wrapper
+  output [`DATA_BITS-1:0] D_in, // data to wrapper
   output [`CACHE_TYPE_BITS-1:0] D_type //type of data
 );
 
