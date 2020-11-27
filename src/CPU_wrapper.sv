@@ -1,4 +1,5 @@
 `include "../include/AXI_define.svh"
+`include "../include/def.svh"
 `include "cpu.sv"
 module cpu_wrapper(
     //READ ADDRESS0
@@ -58,13 +59,13 @@ module cpu_wrapper(
 );
 
 //cpu output
-	logic i_cs;
+	//logic i_cs;
 	logic i_oe;
-	logic [3:0]i_web;
+	//logic [3:0]i_web;
 	logic [31:0]i_address;
-	logic [`data_size-1:0]i_di;
+	//logic [`data_size-1:0]i_di;
 
-	logic d_cs;
+	//logic d_cs;
 	logic d_oe;
 	logic [3:0]d_web;
 	logic [31:0]d_address;
@@ -74,40 +75,127 @@ module cpu_wrapper(
 	logic [`data_size-1:0]d_do;
 	logic i_stall;
 	logic d_stall;
+// d_cache input from cpu
+	logic d_core_req;
+	logic d_core_write;
+	logic [`CACHE_TYPE_BITS-1:0]d_core_type;
+
+// d_cache input from wrapper 
+	logic [`DATA_BITS-1:0]d_d_out;
+	logic d_d_wait;
+// d_cache output to wrapper
+	logic d_d_req;
+	logic [`DATA_BITS-1:0]d_d_addr;
+	logic d_d_write;
+	logic [`DATA_BITS-1:0]d_d_in;
+	logic [`CACHE_TYPE_BITS-1:0]d_d_type;	//don't know how to used
+
+// i_cache input from wrapper
+	logic [`DATA_BITS-1:0]i_d_out;
+	logic i_d_wait;
+// i_cache output to wrapper
+	logic i_d_req;
+	logic [`DATA_BITS-1:0]i_d_addr;
+	logic i_d_write;						//no function(always read)
+	logic [`DATA_BITS-1:0]i_d_in;			//no function(always read)
+	logic [`CACHE_TYPE_BITS-1:0]i_d_type; 	//no function(always read)
+
+// other logic
+	logic d_web_bit;
+	logic [1:0]web_sum;
+	logic d_d_oe;//oe to wrapper (= req & ~write)
+	logic d_d_web_bit;//web to wrapper (= req & write)
+
+
 
 cpu cpu0(
-	.i_cs(i_cs),
-	.i_oe(i_oe),
-	.i_web(i_web),
+	//output---------------------------
+	//.i_cs(i_cs),
+	.i_oe(i_oe),				
+	//.i_web(i_web),
 	.i_address(i_address),
-	.i_di(i_di),
+	//.i_di(i_di),
 
-	.d_cs(d_cs),
-	.d_oe(d_oe),
-	.d_web(d_web),
-	.d_address(d_address),
-	.d_di(d_di),
+	//.d_cs(d_cs),
+	.d_oe(d_oe),				//-> tell cache that cpu want to read data
+	.d_web(d_web),				//-> tell cache that cpu want to write data
+	.d_address(d_address),		//-> give cache address
+	.d_di(d_di),				//-> data input to cache
 
-	.i_do(i_do),
-	.d_do(d_do),
+	//input-----------------------------
+	.i_do(i_do),								
+	.d_do(d_do),				//<- data output from cache
 
 	.i_stall(i_stall),
-	.d_stall(d_stall),
+	.d_stall(d_stall),			//<- stall signal from cache
 
 	.clk(clk),
 	.rst(rst)
 );
 
-logic d_web_bit;
+L1C_inst inst_c(
+	.clk(clk),
+	.rst(rst),
+	.core_addr(i_address),
+	.core_req(i_oe),
+	.core_write(1'b0), 			//always read
+	.core_in(`DATA_BITS'd0),	//always read
+	.core_type(`CACHE_WORD),	//always read
+	.I_out(i_d_out),
+	.I_wait(i_d_wait),
+	.core_out(i_do),
+	.core_wait(i_stall),
+	.I_req(i_d_req),
+	.I_addr(i_d_addr),
+	.I_write(i_d_write),		//always read
+	.I_in(i_d_in),				//always read
+	.I_type(i_d_type)			//always read
+);
+L1C_data data_c(
+	.clk(clk),
+	.rst(rst),
+	.core_addr(d_address),			//<- get the address from cpu
+	.core_req(d_core_req),			//<- cpu tell cache run
+	.core_write(d_core_write),		//<- cpu tell cache write or read (0:read/1:write)
+	.core_in(d_di),					//<- cpu give the write data to cache
+	.core_type(d_core_type),		//<- cpu write/read data type
+	.D_out(d_d_out),				//<- data from wrapper *
+	.D_wait(d_d_wait),				//<- wait signal from cpu wrapper *
+	.core_out(d_do),				//-> cache output the data to cpu
+	.core_wait(d_stall),			//-> cache tell cpu to stall
+	.D_req(d_d_req),				//-> request to cpu wrapper *
+	.D_addr(d_d_addr),				//-> addr to cpu wrapper *
+	.D_write(d_d_write),			//-> 1 = write ; 0 = read *
+	.D_in(d_d_in),					//-> data to wrapper *
+	.D_type(d_d_type)				//-> type of data to wrapper *
+);
+
+// ----------------assign---------------
+
+assign d_core_req = (d_oe|d_web_bit)?1'b1:1'b0;
+assign d_core_write = d_web_bit;
+
 
 always_comb begin
 	if(d_web==4'b1111) d_web_bit = 1'b0;
 	else d_web_bit = 1'b1;
 end
 
+always_comb begin
+	web_sum = d_web[0] + d_web[1] + d_web[2] + d_web[3];
+	case (web_sum)
+		2'd0: d_core_type = `CACHE_WORD;
+		2'd1: d_core_type = `CACHE_WORD; //never touch
+		2'd2: d_core_type = `CACHE_HWORD;
+		2'd3: d_core_type = `CACHE_BYTE;
+	endcase
+end
 
-assign i_stall = (~RVALID_M0) & i_oe;
-assign d_stall = ((~RVALID_M1) & d_oe) | ((~BVALID_M1) & d_web_bit);
+assign i_d_wait = (~RVALID_M0) & i_d_req;
+
+assign d_d_oe = d_d_req & (~d_d_write);
+assign d_d_web_bit = d_d_req & (d_d_write);
+assign d_d_wait = ((~RVALID_M1) & d_d_oe) | ((~BVALID_M1) & d_d_web_bit); //tell cache to wait
 
 
 logic [1:0]M0_state;
@@ -122,8 +210,8 @@ always_ff @(posedge clk, posedge rst) begin
 	else begin
 		case (M0_state)
 			`CPU_WRAPPER_RM0_INI:   begin
-				M0_state <= (i_oe)?`CPU_WRAPPER_RM0_SEND:`CPU_WRAPPER_RM0_INI;
-				M0_r_addr_reg <= i_address;
+				M0_state <= (i_d_req)?`CPU_WRAPPER_RM0_SEND:`CPU_WRAPPER_RM0_INI;
+				M0_r_addr_reg <= i_d_addr;
 			end
 			`CPU_WRAPPER_RM0_SEND:	M0_state <= (ARREADY_M0)?`CPU_WRAPPER_RM0_WAIT:`CPU_WRAPPER_RM0_SEND;
 			`CPU_WRAPPER_RM0_WAIT:	M0_state <= (RVALID_M0)?`CPU_WRAPPER_RM0_INI:`CPU_WRAPPER_RM0_WAIT;
@@ -133,14 +221,14 @@ end
 always_comb begin
 			ARID_M0		= 1'b0;					//
 			ARADDR_M0	= `AXI_ADDR_BITS'b0;
-			ARLEN_M0		= `AXI_LEN_ONE;		//
+			ARLEN_M0	= `AXI_LEN_ONE;			//
 			ARSIZE_M0	= `AXI_SIZE_WORD;		//
 			ARBURST_M0	= `AXI_BURST_INC;		//
 			ARVALID_M0	= 1'b0;
 			//READ DATA
 			RREADY_M0	= 1'b0;
-			//CPU
-			i_do		= 32'b0;
+			//cache
+			i_d_out		= 32'b0;
 	case (M0_state)
 		`CPU_WRAPPER_RM0_INI: begin
 			//READ ADDRESS
@@ -152,8 +240,8 @@ always_comb begin
 			ARVALID_M0	= 1'b0;
 			//READ DATA
 			RREADY_M0	= 1'b0;
-			//CPU
-			i_do		= 32'b0;
+			//cache
+			i_d_out		= 32'b0;
 		end
 		`CPU_WRAPPER_RM0_SEND: begin
 			//READ ADDRESS
@@ -165,8 +253,8 @@ always_comb begin
 			ARVALID_M0	= 1'b1;
 			//READ DATA
 			RREADY_M0	= 1'b0;
-			//CPU
-			i_do		= 32'b0;
+			//cache
+			i_d_out		= 32'b0;
 		end
 		`CPU_WRAPPER_RM0_WAIT: begin
 			//READ ADDRESS
@@ -178,8 +266,8 @@ always_comb begin
 			ARVALID_M0	= 1'b0;
 			//READ DATA
 			RREADY_M0	= 1'b1;
-			//CPU
-			i_do		= RDATA_M0;
+			//cache
+			i_d_out		= RDATA_M0;
 		end
 	endcase
 end
@@ -198,16 +286,16 @@ always_ff @(posedge clk, posedge rst) begin
 	else begin
 		case(M1_state)
 			`CPU_WRAPPER_RM1_INI: 	begin
-				M1_state <= (d_oe)?`CPU_WRAPPER_RM1_RSEND:((d_web_bit)?`CPU_WRAPPER_RM1_WSEND:`CPU_WRAPPER_RM1_INI);
-				if(d_oe) begin
-					M1_r_addr_reg <= d_address;
+				M1_state <= (d_d_oe)?`CPU_WRAPPER_RM1_RSEND:((d_d_web_bit)?`CPU_WRAPPER_RM1_WSEND:`CPU_WRAPPER_RM1_INI);
+				if(d_d_oe) begin
+					M1_r_addr_reg <= d_d_addr; //chang to cache gived address
 					M1_w_addr_reg <= 32'b0;
 					M1_w_data_reg <= 32'b0;
 				end
-				else if(d_web_bit) begin
+				else if(d_d_web_bit) begin
 					M1_r_addr_reg <= 32'b0;
-					M1_w_addr_reg <= d_address;
-					M1_w_data_reg <= d_di;
+					M1_w_addr_reg <= d_d_addr; //chang to cache gived address
+					M1_w_data_reg <= d_d_in;
 				end
 				else begin
 					M1_r_addr_reg <= 32'b0;
@@ -247,8 +335,8 @@ always_comb begin
 			ARVALID_M1	= 1'b0;
 			//READ DATA1
 			RREADY_M1	= 1'b1;
-			//CPU
-			d_do		= 32'b0;
+			//cache
+			d_d_out		= 32'b0;
 	case (M1_state)
 		`CPU_WRAPPER_RM1_INI: begin
 			//Write address
@@ -274,8 +362,8 @@ always_comb begin
 			ARVALID_M1	= 1'b0;
 			//READ DATA1
 			RREADY_M1	= 1'b1;
-			//CPU
-			d_do		= 32'b0;
+			//cache
+			d_d_out		= 32'b0;
 
 		end
 		`CPU_WRAPPER_RM1_RSEND: begin
@@ -302,8 +390,8 @@ always_comb begin
 			ARVALID_M1	= 1'b1;
 			//READ DATA
 			RREADY_M1	= 1'b0;
-			//CPU
-			d_do		= 32'b0;
+			//cache
+			d_d_out		= 32'b0;
 		end
 		`CPU_WRAPPER_RM1_RWAIT: begin
 			//Write address
@@ -329,8 +417,8 @@ always_comb begin
 			ARVALID_M1	= 1'b0;
 			//READ DATA
 			RREADY_M1	= 1'b0;
-			//CPU
-			d_do		= RDATA_M1;
+			//cache
+			d_d_out		= RDATA_M1;
 		end
 		`CPU_WRAPPER_RM1_WSEND: begin
 			//Write address
@@ -356,8 +444,8 @@ always_comb begin
 			ARVALID_M1	= 1'b0;
 			//READ DATA1
 			RREADY_M1	= 1'b1;
-			//CPU
-			d_do		= 32'b0;
+			//cache
+			d_d_out		= 32'b0;
 		end
 		`CPU_WRAPPER_RM1_WWAIT: begin
 			//Write address
@@ -383,8 +471,8 @@ always_comb begin
 			ARVALID_M1	= 1'b0;
 			//READ DATA1
 			RREADY_M1	= 1'b1;
-			//CPU
-			d_do		= 32'b0;
+			//cache
+			d_d_out		= 32'b0;
 		end
 		`CPU_WRAPPER_RM1_WREADY: begin
 			//Write address
@@ -410,8 +498,8 @@ always_comb begin
 			ARVALID_M1	= 1'b0;
 			//READ DATA1
 			RREADY_M1	= 1'b1;
-			//CPU
-			d_do		= 32'b0;
+			//cache
+			d_d_out		= 32'b0;
 		end
 	endcase
 end

@@ -19,7 +19,7 @@ module L1C_inst(
   input I_wait,
   // CPU wrapper to core
   output logic [`DATA_BITS-1:0] core_out,
-   output core_wait,
+  output core_wait,
   // CPU wrapper to Mem
   output logic I_req,
   output logic [`DATA_BITS-1:0] I_addr,

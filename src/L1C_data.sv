@@ -9,14 +9,14 @@ module L1C_data(
   input clk,
   input rst,
   // Core to CPU wrapper
-  input [`DATA_BITS-1:0] core_addr,
-  input core_req,
-  input core_write,
-  input [`DATA_BITS-1:0] core_in,
-  input [`CACHE_TYPE_BITS-1:0] core_type,
+  input [`DATA_BITS-1:0] core_addr, //cpu give address to cache
+  input core_req, //cpu give tell cache to start
+  input core_write, // 0 = write ; 1 = read
+  input [`DATA_BITS-1:0] core_in, //cpu give datas to cache
+  input [`CACHE_TYPE_BITS-1:0] core_type, //type of data
   // Mem to CPU wrapper
-  input [`DATA_BITS-1:0] D_out,
-  input D_wait,
+  input [`DATA_BITS-1:0] D_out, //mem give read data to cache
+  input D_wait, //mem tell cache to wait
   // CPU wrapper to core
   output logic [`DATA_BITS-1:0] core_out,
   output logic core_wait,
@@ -53,24 +53,45 @@ logic [1:0] count;
 
 
   //--------------- complete this part by yourself -----------------//
+
+  //wire
+  logic [2:0] state, nstate;
+  logic hit;
+  logic nvalid; //new valid
+
+  //reg
+  logic [1:0]counter;
   
+
+
+
+  //--------------- assigned --------------//
+  assign index = core_addr[9:4];
+  assign D_addr = {core_addr[31:10],index,counter,core_addr[1:0]};
+  assign hit = valid[index] && (TA_out== core_addr[31:10]);
+
+
+  //---------------------------------------//
+
+  //the data inside data array is : 32bits data
   data_array_wrapper DA(
-    .A(index),
-    .DO(DA_out),
-    .DI(DA_in),
+    .A(index), //input
+    .DO(DA_out), //output
+    .DI(DA_in), //input
     .CK(clk),
-    .WEB(DA_write),
-    .OE(DA_read),
+    .WEB(DA_write), //input 
+    .OE(DA_read), //input
     .CS(1'b1)
   );
-   
+  
+  //the data inside tag array is : (31:10) bits of address
   tag_array_wrapper  TA(
-    .A(index),
-    .DO(TA_out),
-    .DI(TA_in),
+    .A(index), //input
+    .DO(TA_out), //output
+    .DI(TA_in), //input
     .CK(clk),
-    .WEB(TA_write),
-    .OE(TA_read),
+    .WEB(TA_write), //input 16bits;
+    .OE(TA_read), //input
     .CS(1'b1)
   );
 
