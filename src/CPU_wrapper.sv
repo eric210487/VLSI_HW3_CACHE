@@ -1,6 +1,8 @@
 `include "../include/AXI_define.svh"
 `include "../include/def.svh"
 `include "cpu.sv"
+`include "L1C_data.sv"
+`include "L1C_inst.sv"
 module cpu_wrapper(
     //READ ADDRESS0
 	output logic[`AXI_ID_BITS-1:0] ARID_M0,          //don't need out of order (give zero?)
