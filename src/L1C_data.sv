@@ -50,6 +50,8 @@ logic [1:0] count;
   logic read_hit;
   logic [3:0]curr_state;
   logic [3:0]next_state;
+  logic [`CACHE_LINES-1:0] valid_wire;
+  logic [1:0]count_wire;
 
 
   //--------------- complete this part by yourself -----------------//
@@ -66,9 +68,9 @@ logic [1:0] count;
 
 
   //--------------- assigned --------------//
-  assign index = core_addr[9:4];
-  assign D_addr = {core_addr[31:10],index,counter,core_addr[1:0]};
-  assign hit = valid[index] && (TA_out== core_addr[31:10]);
+  //assign index = core_addr[9:4];
+  //assign D_addr = {core_addr[31:10],index,counter,core_addr[1:0]};
+  //assign hit = valid[index] && (TA_out== core_addr[31:10]);
 
 
   //---------------------------------------//
@@ -103,6 +105,8 @@ count <= 2'b00;
   end
   else begin
     curr_state <= next_state;
+    valid <= valid_wire;
+    count <= count_wire;
   end
 end
 always_comb begin
@@ -273,7 +277,7 @@ core_wait = 1;
         D_type = core_type;
         core_out = 32'b0; //not sure
         core_wait = 1'b1; //not sure
-        count = 2'b01;
+        count_wire = 2'b01;
       end
       else if (count==2'b01)begin
         D_req = 1'b1;
@@ -283,7 +287,7 @@ core_wait = 1;
         D_type = core_type;
         core_out = 32'b0; //not sure
         core_wait = 1'b1; //not sure
-        count = 2'b10;
+        count_wire = 2'b10;
       end
       else if (count==2'b10)begin
         D_req = 1'b1;
@@ -293,7 +297,7 @@ core_wait = 1;
         D_type = core_type;
         core_out = 32'b0; //not sure
         core_wait = 1'b1; //not sure
-        count = 2'b11;
+        count_wire = 2'b11;
       end
       else begin
         D_req = 1'b1;
@@ -303,7 +307,7 @@ core_wait = 1;
         D_type = core_type;
         core_out = 32'b0; //not sure
         core_wait = 1'b1; //not sure
-        count = 2'b00;
+        count_wire = 2'b00;
       end
     end
     `READDATA:begin
@@ -343,7 +347,7 @@ core_wait = 1;
         DA_write = 16'h0fff;
         DA_read = 1'b0;
         DA_in = {D_out[31:0],96'b0};
-        valid[core_addr[9:4]]=1'b1;
+        valid_wire[core_addr[9:4]]=1'b1;
       end
     end
     default: begin

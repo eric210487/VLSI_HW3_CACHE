@@ -1,0 +1,113 @@
+Magic 271485
+Revision Verdi_O-2018.09
+
+; Window Layout <x> <y> <width> <height> <signalwidth> <valuewidth>
+viewPort 1920 23 1680 987 239 96
+
+; File list:
+; openDirFile [-d delimiter] [-s time_offset] [-rf auto_bus_rule_file] path_name file_name
+openDirFile -d / "" "/home/eric/Documents/VLSI/Hw3/N26091530/build/top.fsdb"
+
+; file time scale:
+; fileTimeScale ### s|ms|us|ns|ps
+
+; signal spacing:
+signalSpacing 5
+
+; windowTimeUnit is used for zoom, cursor & marker
+; waveform viewport range
+zoom 10171.508789 28665.161133
+cursor 23500.000000
+marker 0.000000
+
+; user define markers
+; userMarker time_pos marker_name color linestyle
+; visible top row signal index
+top 0
+; marker line index
+markerPos 9
+
+; event list
+; addEvent event_name event_expression
+; curEvent event_name
+
+
+
+COMPLEX_EVENT_BEGIN
+
+
+COMPLEX_EVENT_END
+
+
+
+; toolbar current search type
+; curSTATUS search_type
+curSTATUS ByChange
+
+
+addGroup "G1"
+activeDirFile "" "/home/eric/Documents/VLSI/Hw3/N26091530/build/top.fsdb"
+addSignal -h 15 /top_tb/TOP/clk
+addSignal -h 15 -holdScope rst
+addGroup "G2"
+addSignal -h 15 /top_tb/TOP/cpu_wrapper0/cpu0/if0/if_id_reg/data_out[31:0]
+addSignal -h 15 -UNSIGNED -HEX -holdScope pc_out[31:0]
+addGroup "G3"
+addSignal -h 15 /top_tb/TOP/cpu_wrapper0/cpu0/i_do[31:0]
+addSignal -h 15 -UNSIGNED -HEX /top_tb/TOP/cpu_wrapper0/cpu0/if0/if_id_reg/pc_in[31:0]
+addSignal -h 15 /top_tb/TOP/cpu_wrapper0/i_oe
+addGroup "I_CACHE_CPU"
+addSignal -h 15 -UNSIGNED -HEX /top_tb/TOP/cpu_wrapper0/inst_c/core_out[31:0]
+addSignal -h 15 -holdScope core_addr[31:0]
+addSignal -h 15 -holdScope curr_state[3:0]
+addSignal -h 15 -holdScope count[1:0]
+addSignal -h 15 -UNSIGNED -HEX -holdScope count_wire[1:0]
+addSignal -h 15 -holdScope core_type[2:0]
+addSignal -h 15 /top_tb/TOP/cpu_wrapper0/i_stall
+addSignal -h 15 /top_tb/TOP/cpu_wrapper0/inst_c/core_wait
+addGroup "I_CACHE_WRAPPER"
+addSignal -h 15 /top_tb/TOP/cpu_wrapper0/inst_c/I_addr[31:0]
+addSignal -h 15 -holdScope I_out[31:0]
+addSignal -h 15 -holdScope I_type[2:0]
+addSignal -h 15 -holdScope I_req
+addSignal -h 15 -holdScope I_wait
+addGroup "G6"
+addGroup "G7"
+
+; getSignalForm Scope Hierarchy Status
+; active file of getSignalForm
+activeDirFile "" "/home/eric/Documents/VLSI/Hw3/N26091530/build/top.fsdb"
+
+GETSIGNALFORM_SCOPE_HIERARCHY_BEGIN
+getSignalForm close
+
+"/top_tb"
+"/top_tb/TOP"
+"/top_tb/TOP/cpu_wrapper0"
+"/top_tb/TOP/cpu_wrapper0/cpu0"
+"/top_tb/TOP/cpu_wrapper0/cpu0/id0"
+"/top_tb/TOP/cpu_wrapper0/cpu0/id0/registers0"
+"/top_tb/TOP/cpu_wrapper0/inst_c"
+
+SCOPE_LIST_BEGIN
+"/top_tb"
+"/top_tb/TOP"
+"/top_tb/TOP/cpu_wrapper0"
+"/top_tb/TOP/cpu_wrapper0/cpu0"
+"/top_tb/TOP/cpu_wrapper0/cpu0/if0/if_id_reg"
+"/top_tb/TOP/cpu_wrapper0/cpu0/if0"
+"/top_tb/TOP/cpu_wrapper0/cpu0/if0/pc_adder"
+"/top_tb/TOP/cpu_wrapper0/cpu0/datacontrol0"
+"/top_tb/TOP/cpu_wrapper0/cpu0/ex0"
+"/top_tb/TOP/cpu_wrapper0/inst_c"
+"/top_tb/TOP/cpu_wrapper0/cpu0/if0/pc_reg"
+"/top_tb/TOP/cpu_wrapper0/cpu0/if0/pc_mux"
+"/top_tb/TOP/cpu_wrapper0/cpu0/id0/hazard_detector0"
+"/top_tb/TOP/cpu_wrapper0/cpu0/id0/idmux4inputs0"
+"/top_tb/TOP/cpu_wrapper0/cpu0/id0/registers0"
+"/top_tb/TOP/cpu_wrapper0/cpu0/id0"
+SCOPE_LIST_END
+
+GETSIGNALFORM_SCOPE_HIERARCHY_END
+
+

@@ -92,6 +92,8 @@ module cpu_wrapper(
 	logic [`DATA_BITS-1:0]d_d_in;
 	logic [`CACHE_TYPE_BITS-1:0]d_d_type;	//don't know how to used
 
+// i_cache output to cpu;
+	logic i_core_wait;
 // i_cache input from wrapper
 	logic [`DATA_BITS-1:0]i_d_out;
 	logic i_d_wait;
@@ -107,6 +109,7 @@ module cpu_wrapper(
 	logic [1:0]web_sum;
 	logic d_d_oe;//oe to wrapper (= req & ~write)
 	logic d_d_web_bit;//web to wrapper (= req & write)
+	//logic [`DATA_BITS-1:0]i_do_reg;
 
 
 
@@ -146,7 +149,7 @@ L1C_inst inst_c(
 	.I_out(i_d_out),
 	.I_wait(i_d_wait),
 	.core_out(i_do),
-	.core_wait(i_stall),
+	.core_wait(i_core_wait),
 	.I_req(i_d_req),
 	.I_addr(i_d_addr),
 	.I_write(i_d_write),		//always read
@@ -176,6 +179,18 @@ L1C_data data_c(
 
 assign d_core_req = (d_oe|d_web_bit)?1'b1:1'b0;
 assign d_core_write = d_web_bit;
+assign i_stall = i_core_wait & i_oe;
+
+/*
+always_ff @(posedge clk, posedge rst) begin
+	if(rst) begin
+		i_do_reg <= 32'b0;
+	end
+	else begin
+		i_do_reg <= i_do;
+	end
+end
+*/
 
 
 always_comb begin

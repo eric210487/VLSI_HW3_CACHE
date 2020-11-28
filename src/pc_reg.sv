@@ -10,7 +10,7 @@ module pc_reg(
 );
 always_ff @(posedge clk, posedge rst) begin
     if(rst) begin
-        pc_out <= 1'b0;
+        pc_out <= -4;
     end
     else if(w_en) begin
         pc_out <= pc_in;
