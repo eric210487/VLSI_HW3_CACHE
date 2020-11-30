@@ -118,10 +118,11 @@ always_comb begin
       else if (~write_hit) next_state = `WRITEMISS;
     end
     `WRITEHIT:begin
-      next_state = `WRITEDATA;
+      next_state = `WRITEMISS;
     end
     `WRITEMISS:begin
-      next_state = `WRITEDATA;
+      if(~I_wait) next_state = `WRITEDATA;
+      else next_state = `WRITEMISS;
     end
     `WRITEDATA:begin
       next_state = `IDLE;
@@ -193,18 +194,18 @@ always_comb begin
       else if ((core_addr[3:0]==4'b1000)&((core_type==`CACHE_HWORD)||(core_type==`CACHE_HWORD_U)))   begin DA_write = 16'hfcff; DA_in = {48'b0,core_in[15:0],64'b0}; end
       else if ((core_addr[3:0]==4'b1010)&((core_type==`CACHE_HWORD)||(core_type==`CACHE_HWORD_U)))   begin DA_write = 16'hf3ff; DA_in = {32'b0,core_in[31:16],80'b0}; end
       else if ((core_addr[3:2]==2'b10)&(core_type==`CACHE_WORD))                                     begin DA_write = 16'hf0ff; DA_in = {32'b0,core_in[31:0],64'b0}; end
-      else if ((core_addr[3:0]==4'b0100)&((core_type==`CACHE_BYTE)||(core_type==`CACHE_BYTE_U)))     begin DA_write = 16'hefff; DA_in = {24'b0,core_in[7:0],96'b0}; end
-      else if ((core_addr[3:0]==4'b0101)&((core_type==`CACHE_BYTE)||(core_type==`CACHE_BYTE_U)))     begin DA_write = 16'hdfff; DA_in = {16'b0,core_in[15:8],104'b0}; end
-      else if ((core_addr[3:0]==4'b0110)&((core_type==`CACHE_BYTE)||(core_type==`CACHE_BYTE_U)))     begin DA_write = 16'hbfff; DA_in = {8'b0,core_in[23:16],112'b0}; end
-      else if ((core_addr[3:0]==4'b0111)&((core_type==`CACHE_BYTE)||(core_type==`CACHE_BYTE_U)))     begin DA_write = 16'h7fff; DA_in = {core_in[31:24],120'b0}; end
-      else if ((core_addr[3:0]==4'b0100)&((core_type==`CACHE_HWORD)||(core_type==`CACHE_HWORD_U)))   begin DA_write = 16'hcfff; DA_in = {16'b0,core_in[15:0],96'b0}; end
-      else if ((core_addr[3:0]==4'b0110)&((core_type==`CACHE_HWORD)||(core_type==`CACHE_HWORD_U)))   begin DA_write = 16'h3fff; DA_in = {core_in[31:16],112'b0}; end
-      else if ((core_addr[3:2]==2'b01)&(core_type==`CACHE_WORD))                                     begin DA_write = 16'h0fff; DA_in = {core_in[31:0],96'b0}; end
+      else if ((core_addr[3:0]==4'b1100)&((core_type==`CACHE_BYTE)||(core_type==`CACHE_BYTE_U)))     begin DA_write = 16'hefff; DA_in = {24'b0,core_in[7:0],96'b0}; end
+      else if ((core_addr[3:0]==4'b1101)&((core_type==`CACHE_BYTE)||(core_type==`CACHE_BYTE_U)))     begin DA_write = 16'hdfff; DA_in = {16'b0,core_in[15:8],104'b0}; end
+      else if ((core_addr[3:0]==4'b1110)&((core_type==`CACHE_BYTE)||(core_type==`CACHE_BYTE_U)))     begin DA_write = 16'hbfff; DA_in = {8'b0,core_in[23:16],112'b0}; end
+      else if ((core_addr[3:0]==4'b1111)&((core_type==`CACHE_BYTE)||(core_type==`CACHE_BYTE_U)))     begin DA_write = 16'h7fff; DA_in = {core_in[31:24],120'b0}; end
+      else if ((core_addr[3:0]==4'b1100)&((core_type==`CACHE_HWORD)||(core_type==`CACHE_HWORD_U)))   begin DA_write = 16'hcfff; DA_in = {16'b0,core_in[15:0],96'b0}; end
+      else if ((core_addr[3:0]==4'b1110)&((core_type==`CACHE_HWORD)||(core_type==`CACHE_HWORD_U)))   begin DA_write = 16'h3fff; DA_in = {core_in[31:16],112'b0}; end
+      else if ((core_addr[3:2]==2'b11)&(core_type==`CACHE_WORD))                                     begin DA_write = 16'h0fff; DA_in = {core_in[31:0],96'b0}; end
       else begin DA_write = 16'hffff; DA_in = 128'b0; end
       //write data to memory
       I_req = 1'b1;
       I_addr = core_addr;
-      I_write = core_write;
+      I_write = 1'b1;
       I_in = core_in;
       I_type = core_type;
       core_out = 32'b0; //not sure
@@ -214,7 +215,7 @@ always_comb begin
       //write data to memory
       I_req = 1'b1;
       I_addr = core_addr;
-      I_write = core_write;
+      I_write = 1'b1;
       I_in = core_in;
       I_type = core_type;
       core_out = 32'b0; //not sure
@@ -225,7 +226,7 @@ always_comb begin
 	    I_type = core_type;
 	    I_addr = core_addr;
 	    I_in = core_in;
-	    I_write = core_write;
+	    I_write = 1'b1;
 	    core_out = 32'b0;
 	    core_wait = 1'b0;
         if(core_addr[3:2]==2'b00)       core_out = DA_out[31:0];
