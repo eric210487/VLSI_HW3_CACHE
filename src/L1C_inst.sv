@@ -101,7 +101,6 @@ always_ff @(posedge clk, posedge rst) begin
       default: begin
         count <= count;
         valid <= valid;
-
       end
     endcase
   end
@@ -125,11 +124,10 @@ always_comb begin
       next_state = `WRITEDATA;
     end
     `WRITEDATA:begin
-      if(~I_wait) next_state = `IDLE;
-      else next_state = `WRITEDATA;
+      next_state = `IDLE;
     end
     `READ:begin
-      if(read_hit) next_state = `IDLE;
+      if(read_hit) next_state = `WRITEDATA;
       else if (~read_hit)next_state = `READMISS;
     end
     `READMISS:begin
@@ -159,17 +157,13 @@ always_comb begin
         I_in = 32'b0;
         I_type = 3'b0;
         count_wire =2'd0;
-        if(core_addr[3:2]==2'b00)       core_out = DA_out[31:0];
-        else if(core_addr[3:2]==2'b01)  core_out = DA_out[63:32];
-        else if(core_addr[3:2]==2'b10)  core_out = DA_out[95:64];
-        else if(core_addr[3:2]==2'b11)  core_out = DA_out[127:96];
-        else                            core_out = 32'b0;
-    end
+        index = core_addr[9:4];
+        end
     `WRITE:begin
       TA_read = 1'b1;
       TA_write = 1'b1;
       TA_in = core_addr[31:10];
-      index = core_addr[9:4];
+      //index = core_addr[9:4];
       if((TA_out==core_addr[31:10])&&(valid[core_addr[9:4]]==1))write_hit=1'b1;
       else write_hit = 1'b0;
 	    core_wait = 1;
@@ -233,7 +227,13 @@ always_comb begin
 	    I_in = core_in;
 	    I_write = core_write;
 	    core_out = 32'b0;
-	    core_wait = 1'b1;
+	    core_wait = 1'b0;
+        if(core_addr[3:2]==2'b00)       core_out = DA_out[31:0];
+        else if(core_addr[3:2]==2'b01)  core_out = DA_out[63:32];
+        else if(core_addr[3:2]==2'b10)  core_out = DA_out[95:64];
+        else if(core_addr[3:2]==2'b11)  core_out = DA_out[127:96];
+        else                            core_out = 32'b0;
+    
     end
     `READ:begin
       core_wait = 1'b1;
@@ -241,7 +241,7 @@ always_comb begin
       TA_write = 1'b1;
       TA_in = core_addr[31:10];
       index = core_addr[9:4];
-      if((TA_out==core_addr[31:10])&&(valid[core_addr[9:4]]==1))begin
+      if((TA_out==core_addr[31:10])&&(valid[index]==1))begin
         read_hit=1'b1;
         DA_write = 16'hffff;
         DA_in = 32'b0;

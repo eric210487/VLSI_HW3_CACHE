@@ -2,7 +2,7 @@ Magic 271485
 Revision Verdi_O-2018.09
 
 ; Window Layout <x> <y> <width> <height> <signalwidth> <valuewidth>
-viewPort 1920 23 1680 987 239 96
+viewPort 1910 72 1920 1052 239 96
 
 ; File list:
 ; openDirFile [-d delimiter] [-s time_offset] [-rf auto_bus_rule_file] path_name file_name
@@ -16,16 +16,16 @@ signalSpacing 5
 
 ; windowTimeUnit is used for zoom, cursor & marker
 ; waveform viewport range
-zoom 10171.508789 28665.161133
-cursor 23500.000000
+zoom 30740546.264648 30759039.916992
+cursor 30754500.000000
 marker 0.000000
 
 ; user define markers
 ; userMarker time_pos marker_name color linestyle
 ; visible top row signal index
-top 0
+top 8
 ; marker line index
-markerPos 9
+markerPos 46
 
 ; event list
 ; addEvent event_name event_expression
@@ -42,7 +42,7 @@ COMPLEX_EVENT_END
 
 ; toolbar current search type
 ; curSTATUS search_type
-curSTATUS ByChange
+curSTATUS ByValue
 
 
 addGroup "G1"
@@ -54,25 +54,85 @@ addSignal -h 15 /top_tb/TOP/cpu_wrapper0/cpu0/if0/if_id_reg/data_out[31:0]
 addSignal -h 15 -UNSIGNED -HEX -holdScope pc_out[31:0]
 addGroup "G3"
 addSignal -h 15 /top_tb/TOP/cpu_wrapper0/cpu0/i_do[31:0]
-addSignal -h 15 -UNSIGNED -HEX /top_tb/TOP/cpu_wrapper0/cpu0/if0/if_id_reg/pc_in[31:0]
-addSignal -h 15 /top_tb/TOP/cpu_wrapper0/i_oe
+addSignal -h 15 /top_tb/TOP/cpu_wrapper0/cpu0/if0/if_id_reg/pc_in[31:0]
 addGroup "I_CACHE_CPU"
 addSignal -h 15 -UNSIGNED -HEX /top_tb/TOP/cpu_wrapper0/inst_c/core_out[31:0]
 addSignal -h 15 -holdScope core_addr[31:0]
+addSignal -h 15 -UNSIGNED -BIN -holdScope TA_out[21:0]
 addSignal -h 15 -holdScope curr_state[3:0]
+addSignal -h 15 -holdScope read_hit
 addSignal -h 15 -holdScope count[1:0]
 addSignal -h 15 -UNSIGNED -HEX -holdScope count_wire[1:0]
 addSignal -h 15 -holdScope core_type[2:0]
 addSignal -h 15 /top_tb/TOP/cpu_wrapper0/i_stall
-addSignal -h 15 /top_tb/TOP/cpu_wrapper0/inst_c/core_wait
+addSignal -h 15 -holdScope i_oe
 addGroup "I_CACHE_WRAPPER"
 addSignal -h 15 /top_tb/TOP/cpu_wrapper0/inst_c/I_addr[31:0]
-addSignal -h 15 -holdScope I_out[31:0]
+addSignal -h 15 -UNSIGNED -HEX -holdScope I_out[31:0]
 addSignal -h 15 -holdScope I_type[2:0]
 addSignal -h 15 -holdScope I_req
 addSignal -h 15 -holdScope I_wait
-addGroup "G6"
-addGroup "G7"
+addGroup "D_CACHE_CPU"
+addSignal -h 15 /top_tb/TOP/cpu_wrapper0/d_stall
+addSignal -h 15 -holdScope d_oe
+addSignal -h 15 -holdScope d_web_bit
+addSignal -h 15 -holdScope d_stall_state
+addSignal -h 15 /top_tb/TOP/cpu_wrapper0/data_c/core_req
+addSignal -h 15 /top_tb/TOP/cpu_wrapper0/d_core_wait
+addSignal -h 15 /top_tb/TOP/cpu_wrapper0/data_c/core_addr[31:0]
+addSignal -h 15 -holdScope core_in[31:0]
+addSignal -h 15 -holdScope core_in_reg[31:0]
+addSignal -h 15 -holdScope core_out[31:0]
+addSignal -h 15 -UNSIGNED -HEX -holdScope curr_state[3:0]
+addSignal -h 15 -holdScope DA_read
+addSignal -h 15 -holdScope DA_out[127:0]
+addSignal -h 15 -holdScope index[5:0]
+addSignal -h 15 -holdScope DA_write[15:0]
+addSignal -h 15 -UNSIGNED -HEX -holdScope DA_in[127:0]
+addSignal -h 15 -UNSIGNED -HEX -holdScope DA_in[127:0]
+addSignal -h 15 -holdScope DA_write[15:0]
+addSignal -h 15 -holdScope core_type[2:0]
+addSignal -h 15 -holdScope core_type_reg[2:0]
+addGroup "D_CACHE_WRAPPER"
+addGroup "CPU"
+addSignal -h 15 /top_tb/TOP/cpu_wrapper0/cpu0/ex0/alu0/data1[31:0]
+addSignal -h 15 -holdScope data2[31:0]
+addSignal -h 15 -holdScope result[31:0]
+addGroup "REGISTER" -e FALSE
+addSignal -expanded -h 15 /top_tb/TOP/cpu_wrapper0/cpu0/id0/registers0/reg_[31:0]
+addSignal -h 15 -holdScope reg_[31][31:0]
+addSignal -h 15 -holdScope reg_[30][31:0]
+addSignal -h 15 -holdScope reg_[29][31:0]
+addSignal -h 15 -holdScope reg_[28][31:0]
+addSignal -h 15 -holdScope reg_[27][31:0]
+addSignal -h 15 -holdScope reg_[26][31:0]
+addSignal -h 15 -holdScope reg_[25][31:0]
+addSignal -h 15 -holdScope reg_[24][31:0]
+addSignal -h 15 -holdScope reg_[23][31:0]
+addSignal -h 15 -holdScope reg_[22][31:0]
+addSignal -h 15 -holdScope reg_[21][31:0]
+addSignal -h 15 -holdScope reg_[20][31:0]
+addSignal -h 15 -holdScope reg_[19][31:0]
+addSignal -h 15 -holdScope reg_[18][31:0]
+addSignal -h 15 -holdScope reg_[17][31:0]
+addSignal -h 15 -holdScope reg_[16][31:0]
+addSignal -h 15 -holdScope reg_[15][31:0]
+addSignal -h 15 -holdScope reg_[14][31:0]
+addSignal -h 15 -holdScope reg_[13][31:0]
+addSignal -h 15 -holdScope reg_[12][31:0]
+addSignal -h 15 -holdScope reg_[11][31:0]
+addSignal -h 15 -holdScope reg_[10][31:0]
+addSignal -h 15 -holdScope reg_[9][31:0]
+addSignal -h 15 -holdScope reg_[8][31:0]
+addSignal -h 15 -holdScope reg_[7][31:0]
+addSignal -h 15 -holdScope reg_[6][31:0]
+addSignal -h 15 -UNSIGNED -HEX -holdScope reg_[5][31:0]
+addSignal -h 15 -holdScope reg_[4][31:0]
+addSignal -h 15 -holdScope reg_[3][31:0]
+addSignal -h 15 -holdScope reg_[2][31:0]
+addSignal -h 15 -holdScope reg_[1][31:0]
+addSignal -h 15 -holdScope reg_[0][31:0]
+addGroup "G10"
 
 ; getSignalForm Scope Hierarchy Status
 ; active file of getSignalForm
@@ -83,10 +143,17 @@ getSignalForm close
 
 "/top_tb"
 "/top_tb/TOP"
+"/top_tb/TOP/DM1"
+"/top_tb/TOP/DM1/i_SRAM"
 "/top_tb/TOP/cpu_wrapper0"
 "/top_tb/TOP/cpu_wrapper0/cpu0"
+"/top_tb/TOP/cpu_wrapper0/cpu0/ex0"
+"/top_tb/TOP/cpu_wrapper0/cpu0/ex0/alu0"
 "/top_tb/TOP/cpu_wrapper0/cpu0/id0"
 "/top_tb/TOP/cpu_wrapper0/cpu0/id0/registers0"
+"/top_tb/TOP/cpu_wrapper0/cpu0/if0"
+"/top_tb/TOP/cpu_wrapper0/cpu0/if0/if_id_reg"
+"/top_tb/TOP/cpu_wrapper0/data_c"
 "/top_tb/TOP/cpu_wrapper0/inst_c"
 
 SCOPE_LIST_BEGIN
@@ -100,12 +167,17 @@ SCOPE_LIST_BEGIN
 "/top_tb/TOP/cpu_wrapper0/cpu0/datacontrol0"
 "/top_tb/TOP/cpu_wrapper0/cpu0/ex0"
 "/top_tb/TOP/cpu_wrapper0/inst_c"
-"/top_tb/TOP/cpu_wrapper0/cpu0/if0/pc_reg"
-"/top_tb/TOP/cpu_wrapper0/cpu0/if0/pc_mux"
-"/top_tb/TOP/cpu_wrapper0/cpu0/id0/hazard_detector0"
-"/top_tb/TOP/cpu_wrapper0/cpu0/id0/idmux4inputs0"
-"/top_tb/TOP/cpu_wrapper0/cpu0/id0/registers0"
+"/top_tb/TOP/cpu_wrapper0/data_c"
+"/top_tb/TOP/cpu_wrapper0/inst_c/DA"
+"/top_tb/TOP/DM1"
 "/top_tb/TOP/cpu_wrapper0/cpu0/id0"
+"/top_tb/TOP/cpu_wrapper0/cpu0/wbmux0"
+"/top_tb/TOP/cpu_wrapper0/data_c/DA"
+"/top_tb/TOP/cpu_wrapper0/data_c/TA"
+"/top_tb/TOP/cpu_wrapper0/cpu0/id0/registers0"
+"/top_tb/TOP/DM1/i_SRAM"
+"/top_tb/TOP/cpu_wrapper0/inst_c/TA"
+"/top_tb/TOP/cpu_wrapper0/cpu0/ex0/alu0"
 SCOPE_LIST_END
 
 GETSIGNALFORM_SCOPE_HIERARCHY_END

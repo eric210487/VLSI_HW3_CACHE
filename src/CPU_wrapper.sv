@@ -79,8 +79,9 @@ module cpu_wrapper(
 	logic d_stall;
 // d_cache input from cpu
 	logic d_core_req;
-	logic d_core_write;
 	logic [`CACHE_TYPE_BITS-1:0]d_core_type;
+// d_cache output to cpu
+	logic d_core_wait;
 
 // d_cache input from wrapper 
 	logic [`DATA_BITS-1:0]d_d_out;
@@ -110,6 +111,11 @@ module cpu_wrapper(
 	logic d_d_oe;//oe to wrapper (= req & ~write)
 	logic d_d_web_bit;//web to wrapper (= req & write)
 	//logic [`DATA_BITS-1:0]i_do_reg;
+// state reg for stall
+	logic i_stall_state; 
+	logic n_i_stall_state;
+	logic d_stall_state;
+	logic n_d_stall_state;
 
 
 
@@ -143,31 +149,31 @@ L1C_inst inst_c(
 	.rst(rst),
 	.core_addr(i_address),
 	.core_req(i_oe),
-	.core_write(1'b0), 			//always read
-	.core_in(`DATA_BITS'd0),	//always read
-	.core_type(`CACHE_WORD),	//always read
+	.core_write(1'b0), 				//always read
+	.core_in(`DATA_BITS'd0),		//always read
+	.core_type(`CACHE_WORD),		//always read
 	.I_out(i_d_out),
 	.I_wait(i_d_wait),
 	.core_out(i_do),
 	.core_wait(i_core_wait),
 	.I_req(i_d_req),
 	.I_addr(i_d_addr),
-	.I_write(i_d_write),		//always read
-	.I_in(i_d_in),				//always read
-	.I_type(i_d_type)			//always read
+	.I_write(i_d_write),			//always read
+	.I_in(i_d_in),					//always read
+	.I_type(i_d_type)				//always read
 );
 L1C_data data_c(
 	.clk(clk),
 	.rst(rst),
 	.core_addr(d_address),			//<- get the address from cpu
 	.core_req(d_core_req),			//<- cpu tell cache run
-	.core_write(d_core_write),		//<- cpu tell cache write or read (0:read/1:write)
+	.core_write(d_web_bit),			//<- cpu tell cache write or read (0:read/1:write)
 	.core_in(d_di),					//<- cpu give the write data to cache
 	.core_type(d_core_type),		//<- cpu write/read data type
 	.D_out(d_d_out),				//<- data from wrapper *
 	.D_wait(d_d_wait),				//<- wait signal from cpu wrapper *
 	.core_out(d_do),				//-> cache output the data to cpu
-	.core_wait(d_stall),			//-> cache tell cpu to stall
+	.core_wait(d_core_wait),		//-> cache tell cpu to stall
 	.D_req(d_d_req),				//-> request to cpu wrapper *
 	.D_addr(d_d_addr),				//-> addr to cpu wrapper *
 	.D_write(d_d_write),			//-> 1 = write ; 0 = read *
@@ -178,26 +184,14 @@ L1C_data data_c(
 // ----------------assign---------------
 
 assign d_core_req = (d_oe|d_web_bit)?1'b1:1'b0;
-assign d_core_write = d_web_bit;
-assign i_stall = i_core_wait & i_oe;
 
-/*
-always_ff @(posedge clk, posedge rst) begin
-	if(rst) begin
-		i_do_reg <= 32'b0;
-	end
-	else begin
-		i_do_reg <= i_do;
-	end
-end
-*/
-
-
+//convert d_web to 1-bit
 always_comb begin
 	if(d_web==4'b1111) d_web_bit = 1'b0;
 	else d_web_bit = 1'b1;
 end
 
+//convert web to type
 always_comb begin
 	web_sum = d_web[0] + d_web[1] + d_web[2] + d_web[3];
 	case (web_sum)
@@ -208,6 +202,75 @@ always_comb begin
 	endcase
 end
 
+//state machine for i_stall
+always_ff @(posedge clk, posedge rst) begin
+	if(rst) begin
+		i_stall_state <= `IDLE;
+	end
+	else begin
+		i_stall_state <= n_i_stall_state;
+	end
+end
+always_comb begin
+	case (i_stall_state)
+		`IDLE: begin
+			if(i_oe) begin
+				i_stall = 1'b1;
+				n_i_stall_state = `STALL;
+			end
+			else begin
+				i_stall = 1'b0;
+				n_i_stall_state = `IDLE;
+			end 
+		end
+		`STALL: begin
+			if(~i_core_wait) begin
+				i_stall = 1'b0;
+				n_i_stall_state = `IDLE;
+			end
+			else begin
+				i_stall = 1'b1;
+				n_i_stall_state = `STALL;
+			end
+		end
+	endcase
+end
+
+//state machine for d_stall
+always_ff @(posedge clk, posedge rst) begin
+	if(rst) begin
+		d_stall_state <= `IDLE;
+	end
+	else begin
+		d_stall_state <= n_d_stall_state;
+	end
+end
+always_comb begin
+	case (d_stall_state)
+		`IDLE: begin
+			if(d_oe | d_web_bit) begin
+				d_stall = 1'b1;
+				n_d_stall_state = `STALL;
+			end
+			else begin
+				d_stall = 1'b0;
+				n_d_stall_state = `IDLE;
+			end 
+		end
+		`STALL: begin
+			if(~d_core_wait) begin
+				d_stall = 1'b0;
+				n_d_stall_state = `IDLE;
+			end
+			else begin
+				d_stall = 1'b1;
+				n_d_stall_state = `STALL;
+			end
+		end
+	endcase
+end
+
+//wait signal from cpu wrapper
 assign i_d_wait = (~RVALID_M0) & i_d_req;
 
 assign d_d_oe = d_d_req & (~d_d_write);
@@ -226,7 +289,7 @@ always_ff @(posedge clk, posedge rst) begin
 	end
 	else begin
 		case (M0_state)
-			`CPU_WRAPPER_RM0_INI:   begin
+			`CPU_WRAPPER_RM0_INI: begin
 				M0_state <= (i_d_req)?`CPU_WRAPPER_RM0_SEND:`CPU_WRAPPER_RM0_INI;
 				M0_r_addr_reg <= i_d_addr;
 			end

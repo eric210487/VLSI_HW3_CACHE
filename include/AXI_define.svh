@@ -93,3 +93,7 @@
 `define log_reg_num 5
 `define reg_num 32
 `define func_size 4
+
+//stall state
+`define IDLE    2'b0
+`define STALL   2'b1
