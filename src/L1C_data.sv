@@ -225,16 +225,9 @@ always_comb begin
       D_req = 1'b1;
       D_addr = core_addr;
       D_write = 1'b1;
-      
     end
     `WRITEDATA:begin
       core_wait = 1'b0;
-      DA_read = 1'b1;
-        if(core_addr[3:2]==2'b00)       core_out = DA_out[31:0];
-        else if(core_addr[3:2]==2'b01)  core_out = DA_out[63:32];
-        else if(core_addr[3:2]==2'b10)  core_out = DA_out[95:64];
-        else if(core_addr[3:2]==2'b11)  core_out = DA_out[127:96];
-        else                            core_out = 32'b0;
     end
     `READ:begin
       TA_read = 1'b1;
@@ -278,6 +271,5 @@ always_comb begin
     end
   endcase
 end
-
 endmodule
 
