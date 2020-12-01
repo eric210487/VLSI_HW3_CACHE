@@ -95,5 +95,5 @@
 `define func_size 4
 
 //stall state
-`define IDLE    2'b0
+`define S_IDLE    2'b0
 `define STALL   2'b1

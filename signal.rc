@@ -16,16 +16,16 @@ signalSpacing 5
 
 ; windowTimeUnit is used for zoom, cursor & marker
 ; waveform viewport range
-zoom 30740546.264648 30759039.916992
-cursor 30754500.000000
+zoom 27087424.682617 27105918.334961
+cursor 27086500.000000
 marker 0.000000
 
 ; user define markers
 ; userMarker time_pos marker_name color linestyle
 ; visible top row signal index
-top 8
+top 0
 ; marker line index
-markerPos 46
+markerPos 29
 
 ; event list
 ; addEvent event_name event_expression
@@ -56,48 +56,24 @@ addGroup "G3"
 addSignal -h 15 /top_tb/TOP/cpu_wrapper0/cpu0/i_do[31:0]
 addSignal -h 15 /top_tb/TOP/cpu_wrapper0/cpu0/if0/if_id_reg/pc_in[31:0]
 addGroup "I_CACHE_CPU"
-addSignal -h 15 -UNSIGNED -HEX /top_tb/TOP/cpu_wrapper0/inst_c/core_out[31:0]
-addSignal -h 15 -holdScope core_addr[31:0]
-addSignal -h 15 -UNSIGNED -BIN -holdScope TA_out[21:0]
-addSignal -h 15 -holdScope curr_state[3:0]
-addSignal -h 15 -holdScope read_hit
-addSignal -h 15 -holdScope count[1:0]
-addSignal -h 15 -UNSIGNED -HEX -holdScope count_wire[1:0]
-addSignal -h 15 -holdScope core_type[2:0]
-addSignal -h 15 /top_tb/TOP/cpu_wrapper0/i_stall
-addSignal -h 15 -holdScope i_oe
 addGroup "I_CACHE_WRAPPER"
-addSignal -h 15 /top_tb/TOP/cpu_wrapper0/inst_c/I_addr[31:0]
-addSignal -h 15 -UNSIGNED -HEX -holdScope I_out[31:0]
-addSignal -h 15 -holdScope I_type[2:0]
-addSignal -h 15 -holdScope I_req
-addSignal -h 15 -holdScope I_wait
 addGroup "D_CACHE_CPU"
-addSignal -h 15 /top_tb/TOP/cpu_wrapper0/d_stall
-addSignal -h 15 -holdScope d_oe
-addSignal -h 15 -holdScope d_web_bit
-addSignal -h 15 -holdScope d_stall_state
-addSignal -h 15 /top_tb/TOP/cpu_wrapper0/data_c/core_req
-addSignal -h 15 /top_tb/TOP/cpu_wrapper0/d_core_wait
-addSignal -h 15 /top_tb/TOP/cpu_wrapper0/data_c/core_addr[31:0]
+addSignal -h 15 -UNSIGNED -HEX /top_tb/TOP/cpu_wrapper0/data_c/core_addr[31:0]
+addSignal -h 15 -holdScope D_addr[31:0]
+addSignal -h 15 -holdScope D_in[31:0]
 addSignal -h 15 -holdScope core_in[31:0]
-addSignal -h 15 -holdScope core_in_reg[31:0]
 addSignal -h 15 -holdScope core_out[31:0]
 addSignal -h 15 -UNSIGNED -HEX -holdScope curr_state[3:0]
 addSignal -h 15 -holdScope DA_read
-addSignal -h 15 -holdScope DA_out[127:0]
+addSignal -h 15 -UNSIGNED -HEX -holdScope DA_out[127:0]
 addSignal -h 15 -holdScope index[5:0]
 addSignal -h 15 -holdScope DA_write[15:0]
 addSignal -h 15 -UNSIGNED -HEX -holdScope DA_in[127:0]
-addSignal -h 15 -UNSIGNED -HEX -holdScope DA_in[127:0]
-addSignal -h 15 -holdScope DA_write[15:0]
 addSignal -h 15 -holdScope core_type[2:0]
-addSignal -h 15 -holdScope core_type_reg[2:0]
+addSignal -h 15 -holdScope write_hit
+addSignal -h 15 -holdScope read_hit
+addSignal -h 15 -UNSIGNED -BIN -holdScope TA_out[21:0]
 addGroup "D_CACHE_WRAPPER"
-addGroup "CPU"
-addSignal -h 15 /top_tb/TOP/cpu_wrapper0/cpu0/ex0/alu0/data1[31:0]
-addSignal -h 15 -holdScope data2[31:0]
-addSignal -h 15 -holdScope result[31:0]
 addGroup "REGISTER" -e FALSE
 addSignal -expanded -h 15 /top_tb/TOP/cpu_wrapper0/cpu0/id0/registers0/reg_[31:0]
 addSignal -h 15 -holdScope reg_[31][31:0]
@@ -132,6 +108,7 @@ addSignal -h 15 -holdScope reg_[3][31:0]
 addSignal -h 15 -holdScope reg_[2][31:0]
 addSignal -h 15 -holdScope reg_[1][31:0]
 addSignal -h 15 -holdScope reg_[0][31:0]
+addGroup "CPU"
 addGroup "G10"
 
 ; getSignalForm Scope Hierarchy Status

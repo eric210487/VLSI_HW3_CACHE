@@ -39,13 +39,15 @@ module L1C_inst(
   logic [`CACHE_TAG_BITS-1:0] TA_in;
   logic TA_write;
   logic TA_read;
+
   logic [`CACHE_LINES-1:0] valid;
-  logic [`CACHE_LINES-1:0] valid_wire;
+  logic valid_wire;
   logic [1:0]count;
   logic [1:0]count_wire;
   logic read_hit;
   logic write_hit;
-  logic [3:0]next_state,curr_state;
+  logic [3:0]curr_state;
+  logic [3:0]next_state;
 
   //--------------- complete this part by yourself -----------------//
   
@@ -69,6 +71,11 @@ module L1C_inst(
     .CS(1'b1)
   );
 
+  //-------------------assign-------------------//
+  assign index = core_addr[9:4];
+  assign TA_in = core_addr[31:10];
+  assign I_in = core_in;
+  assign I_type = core_type;
 
 always_ff @(posedge clk, posedge rst) begin
   if(rst)begin
@@ -86,17 +93,13 @@ always_ff @(posedge clk, posedge rst) begin
   end
   else begin
     case (curr_state)
-      `IDLE: begin
-        count <= count;
-        valid <= valid;
-      end
       `READMISS: begin
         count <= count_wire;
         valid <= valid;
       end
       `READDATA: begin
         count <= count;
-        valid <= valid_wire;
+        valid[index] <= valid_wire;
       end
       default: begin
         count <= count;
@@ -128,7 +131,7 @@ always_comb begin
       next_state = `IDLE;
     end
     `READ:begin
-      if(read_hit) next_state = `WRITEDATA;
+      if(read_hit) next_state = `READOUT;
       else if (~read_hit)next_state = `READMISS;
     end
     `READMISS:begin
@@ -141,38 +144,47 @@ always_comb begin
       end
       else next_state = `READDATA;
     end
-	default:begin
-	
-end
+    `READOUT: begin
+      next_state = `IDLE;
+    end
+	  default:begin
+      next_state = `IDLE;
+    end
 endcase
 end
 
 always_comb begin
+  //core
+  core_out = 32'd0;
+  core_wait = 1'b1;
+  //wrapper
+  I_req = 1'b0;
+  I_addr = 32'd0;
+  I_write = 1'b0;
+  //data array
+  DA_in = 128'd0;
+  DA_write = 16'hffff;
+  DA_read = 1'b0;
+  //tag array
+  TA_write = 1'b1; 
+  TA_read = 1'b0;
+  //count
+  count_wire = 2'd0;
+  //hit
+  read_hit = 1'b0;
+  write_hit = 1'b0;
+  //valid 
+  valid_wire = 1'b0;
+
   case (curr_state)
     `IDLE:begin
-      	core_out = 32'b0;
         core_wait = 1'b0;
-        I_req = 1'b0;
-        I_addr = 32'b0;
-        I_write = 1'b0;
-        I_in = 32'b0;
-        I_type = 3'b0;
-        count_wire =2'd0;
-        index = core_addr[9:4];
         end
     `WRITE:begin
       TA_read = 1'b1;
-      TA_write = 1'b1;
-      TA_in = core_addr[31:10];
-      //index = core_addr[9:4];
-      if((TA_out==core_addr[31:10])&&(valid[core_addr[9:4]]==1))write_hit=1'b1;
-      else write_hit = 1'b0;
-	    core_wait = 1;
+      write_hit = ((TA_out==core_addr[31:10])&&(valid[index]==1))?1'b1:1'b0;
     end
     `WRITEHIT:begin
-      //write data to data array
-      DA_read = 1'b0;
-      index = core_addr[9:4];
       if ((core_addr[3:0]==4'b0000)&((core_type==`CACHE_BYTE)||(core_type==`CACHE_BYTE_U)))          begin DA_write = 16'hfffe; DA_in = {120'b0,core_in[7:0]}; end
       else if ((core_addr[3:0]==4'b0001)&((core_type==`CACHE_BYTE)||(core_type==`CACHE_BYTE_U)))     begin DA_write = 16'hfffd; DA_in = {112'b0,core_in[15:8],8'b0}; end
       else if ((core_addr[3:0]==4'b0010)&((core_type==`CACHE_BYTE)||(core_type==`CACHE_BYTE_U)))     begin DA_write = 16'hfffb; DA_in = {104'b0,core_in[23:16],16'b0}; end
@@ -206,165 +218,63 @@ always_comb begin
       I_req = 1'b1;
       I_addr = core_addr;
       I_write = 1'b1;
-      I_in = core_in;
-      I_type = core_type;
-      core_out = 32'b0; //not sure
-      core_wait = 1'b1; //not sure
+      
     end
     `WRITEMISS:begin
       //write data to memory
       I_req = 1'b1;
       I_addr = core_addr;
       I_write = 1'b1;
-      I_in = core_in;
-      I_type = core_type;
-      core_out = 32'b0; //not sure
-      core_wait = 1'b1; //not sure
+      
     end
     `WRITEDATA:begin
-	    I_req = 1'b0;
-	    I_type = core_type;
-	    I_addr = core_addr;
-	    I_in = core_in;
-	    I_write = 1'b1;
-	    core_out = 32'b0;
-	    core_wait = 1'b0;
+      core_wait = 1'b0;
+      DA_read = 1'b1;
         if(core_addr[3:2]==2'b00)       core_out = DA_out[31:0];
         else if(core_addr[3:2]==2'b01)  core_out = DA_out[63:32];
         else if(core_addr[3:2]==2'b10)  core_out = DA_out[95:64];
         else if(core_addr[3:2]==2'b11)  core_out = DA_out[127:96];
         else                            core_out = 32'b0;
-    
     end
     `READ:begin
-      core_wait = 1'b1;
       TA_read = 1'b1;
-      TA_write = 1'b1;
-      TA_in = core_addr[31:10];
-      index = core_addr[9:4];
-      if((TA_out==core_addr[31:10])&&(valid[index]==1))begin
-        read_hit=1'b1;
-        DA_write = 16'hffff;
-        DA_in = 32'b0;
-        DA_read = 1'b1;
-        /*if(core_addr[3:2]==2'b00)       core_out = DA_out[31:0];
-        else if(core_addr[3:2]==2'b01)  core_out = DA_out[63:32];
-        else if(core_addr[3:2]==2'b10)  core_out = DA_out[95:64];
-        else if(core_addr[3:2]==2'b11)  core_out = DA_out[127:96];
-        else                            core_out = 32'b0;*/
-        /*if ((core_addr[3:2]==00)&(core_type==`CACHE_BYTE))          core_out = {24'b0,DA_out[7:0]};
-        else if ((core_addr[3:2]==00)&(core_type==`CACHE_HWORD))    core_out = {16'b0,DA_out[15:0]};
-        else if ((core_addr[3:2]==00)&(core_type==`CACHE_WORD))     core_out = DA_out[31:0];
-        else if ((core_addr[3:2]==00)&(core_type==`CACHE_BYTE_U))   core_out = {24'b0,DA_out[7:0]};
-        else if ((core_addr[3:2]==00)&(core_type==`CACHE_HWORD_U))  core_out = {16'b0,DA_out[15:0]};
-        else if ((core_addr[3:2]==01)&(core_type==`CACHE_BYTE))     core_out = {24'b0,DA_out[39:32]};
-        else if ((core_addr[3:2]==01)&(core_type==`CACHE_HWORD))    core_out = {16'b0,DA_out[47:32]};
-        else if ((core_addr[3:2]==01)&(core_type==`CACHE_WORD))     core_out = DA_out[63:32];
-        else if ((core_addr[3:2]==01)&(core_type==`CACHE_BYTE_U))   core_out = {24'b0,DA_out[39:32]};
-        else if ((core_addr[3:2]==01)&(core_type==`CACHE_HWORD_U))  core_out = {16'b0,DA_out[47:32]};
-        else if ((core_addr[3:2]==10)&(core_type==`CACHE_BYTE))     core_out = {24'b0,DA_out[71:64]};
-        else if ((core_addr[3:2]==10)&(core_type==`CACHE_HWORD))    core_out = {16'b0,DA_out[79:64]};
-        else if ((core_addr[3:2]==10)&(core_type==`CACHE_WORD))     core_out = DA_out[95:64];
-        else if ((core_addr[3:2]==10)&(core_type==`CACHE_BYTE_U))   core_out = {24'b0,DA_out[71:64]};
-        else if ((core_addr[3:2]==10)&(core_type==`CACHE_HWORD_U))  core_out = {16'b0,DA_out[79:64]};
-        else if ((core_addr[3:2]==11)&(core_type==`CACHE_BYTE))     core_out = {24'b0,DA_out[103:96]};
-        else if ((core_addr[3:2]==11)&(core_type==`CACHE_HWORD))    core_out = {16'b0,DA_out[111:96]};
-        else if ((core_addr[3:2]==11)&(core_type==`CACHE_WORD))     core_out = DA_out[127:96];
-        else if ((core_addr[3:2]==11)&(core_type==`CACHE_BYTE_U))   core_out = {24'b0,DA_out[103:96]};
-        else if ((core_addr[3:2]==11)&(core_type==`CACHE_HWORD_U))  core_out = {16'b0,DA_out[111:96]};*/
-      end
-      else read_hit = 1'b0;
+      read_hit = ((TA_out==core_addr[31:10])&&(valid[index]==1))?1'b1:1'b0;
     end
     `READMISS:begin
-      if(count==2'b00)begin
-        I_req = 1'b1;
-        I_addr = {core_addr[31:4],2'b00,core_addr[1:0]};
-        I_write = 1'b0;
-        I_in = core_in;
-        I_type = core_type;
-        core_out = 32'b0; //not sure
-        core_wait = 1'b1; //not sure
-        count_wire = 2'b01;
-      end
-      else if (count==2'b01)begin
-        I_req = 1'b1;
-        I_addr = {core_addr[31:4],2'b01,core_addr[1:0]};
-        I_write = 1'b0;
-        I_in = core_in;
-        I_type = core_type;
-        core_out = 32'b0; //not sure
-        core_wait = 1'b1; //not sure
-        count_wire = 2'b10;
-      end
-      else if (count==2'b10)begin
-        I_req = 1'b1;
-        I_addr = {core_addr[31:4],2'b10,core_addr[1:0]};
-        I_write = 1'b0;
-        I_in = core_in;
-        I_type = core_type;
-        core_out = 32'b0; //not sure
-        core_wait = 1'b1; //not sure
-        count_wire = 2'b11;
-      end
-      else begin
-        I_req = 1'b1;
-        I_addr = {core_addr[31:4],2'b11,core_addr[1:0]};
-        I_write = 1'b0;
-        I_in = core_in;
-        I_type = core_type;
-        core_out = 32'b0; //not sure
-        core_wait = 1'b1; //not sure
-        count_wire = 2'b00;
-      end
+      I_req = 1'b1;
+      I_addr = {core_addr[31:4],count,core_addr[1:0]};
+      count_wire = count + 2'b01;
     end
     `READDATA:begin
-	    core_wait = 1;
+      I_req = 1'b1;
+      TA_write = 1'b0;
       if(count==2'b01)begin
-        index = core_addr[9:4];
-        TA_write = 1'b0;
-        TA_read = 1'b0;
-        TA_in = core_addr[31:10];
         DA_write = 16'hfff0;
-        DA_read = 1'b0;
         DA_in = {96'b0,I_out[31:0]};
       end
       else if (count==2'b10)begin
-        index = core_addr[9:4];
-        TA_write = 1'b0;
-        TA_read = 1'b0;
-        TA_in = core_addr[31:10];
         DA_write = 16'hff0f;
-        DA_read = 1'b0;
         DA_in = {64'b0,I_out[31:0],32'b0};
       end
       else if (count==2'b11)begin
-        index = core_addr[9:4];
-        TA_write = 1'b0;
-        TA_read = 1'b0;
-        TA_in = core_addr[31:10];
         DA_write = 16'hf0ff;
-        DA_read = 1'b0;
         DA_in = {32'b0,I_out[31:0],64'b0};
       end
       else begin
-        index = core_addr[9:4];
-        TA_write = 1'b0;
-        TA_read = 1'b0;
-        TA_in = core_addr[31:10];
         DA_write = 16'h0fff;
-        DA_read = 1'b0;
         DA_in = {I_out[31:0],96'b0};
-        valid_wire[core_addr[9:4]]=1'b1;
+        valid_wire = 1'b1;
       end
     end
-    default: begin
-        core_out = 32'b0;
-        core_wait = 1'b0;
-        I_req = 1'b0;
-        I_addr = 32'b0;
-        I_write = 1'b0;
-        I_in = 32'b0;
-        I_type = 3'b0; 
+    `READOUT:begin
+      core_wait = 1'b0;
+      DA_read = 1'b1;
+      case (core_addr[3:2])
+        2'b00:  core_out = DA_out[31:0];
+        2'b01:  core_out = DA_out[63:32];
+        2'b10:  core_out = DA_out[95:64];
+        2'b11:  core_out = DA_out[127:96];
+      endcase
     end
   endcase
 end

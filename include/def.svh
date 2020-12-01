@@ -30,13 +30,14 @@
 `define HWORD `WRITE_LEN_BITS'b01
 `define WORD `WRITE_LEN_BITS'b10
 
-`define IDLE 4'b0000
-`define WRITE 4'b0001
-`define WRITEHIT 4'b0010
-`define WRITEMISS 4'b0011
-`define WRITEDATA 4'b0100
-`define READ 4'b0101
-`define READMISS 4'b0110
-`define READDATA 4'b0111
+`define IDLE        4'b0000
+`define WRITE       4'b0001
+`define WRITEHIT    4'b0010
+`define WRITEMISS   4'b0011
+`define WRITEDATA   4'b0100
+`define READ        4'b0101
+`define READMISS    4'b0110
+`define READDATA    4'b0111
+`define READOUT     4'b1000     
 
 `endif

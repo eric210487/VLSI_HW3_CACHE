@@ -213,20 +213,20 @@ always_ff @(posedge clk, posedge rst) begin
 end
 always_comb begin
 	case (i_stall_state)
-		`IDLE: begin
+		`S_IDLE: begin
 			if(i_oe) begin
 				i_stall = 1'b1;
 				n_i_stall_state = `STALL;
 			end
 			else begin
 				i_stall = 1'b0;
-				n_i_stall_state = `IDLE;
+				n_i_stall_state = `S_IDLE;
 			end 
 		end
 		`STALL: begin
 			if(~i_core_wait) begin
 				i_stall = 1'b0;
-				n_i_stall_state = `IDLE;
+				n_i_stall_state = `S_IDLE;
 			end
 			else begin
 				i_stall = 1'b1;
@@ -247,20 +247,20 @@ always_ff @(posedge clk, posedge rst) begin
 end
 always_comb begin
 	case (d_stall_state)
-		`IDLE: begin
+		`S_IDLE: begin
 			if(d_oe | d_web_bit) begin
 				d_stall = 1'b1;
 				n_d_stall_state = `STALL;
 			end
 			else begin
 				d_stall = 1'b0;
-				n_d_stall_state = `IDLE;
+				n_d_stall_state = `S_IDLE;
 			end 
 		end
 		`STALL: begin
 			if(~d_core_wait) begin
 				d_stall = 1'b0;
-				n_d_stall_state = `IDLE;
+				n_d_stall_state = `S_IDLE;
 			end
 			else begin
 				d_stall = 1'b1;
