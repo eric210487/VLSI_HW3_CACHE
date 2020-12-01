@@ -1,5 +1,0 @@
-//
-// File created by:  irun
-// Do not modify this file
-
-s1::(01Dec2020:11:35:58):( irun /home/eric/Documents/VLSI/Hw3/N26091530/./sim/top_tb.sv +incdir+/home/eric/Documents/VLSI/Hw3/N26091530/./src+/home/eric/Documents/VLSI/Hw3/N26091530/./src/AXI+/home/eric/Documents/VLSI/Hw3/N26091530/./include+/home/eric/Documents/VLSI/Hw3/N26091530/./sim +define+prog1 -define CYCLE=10.0 -define MAX=6000000 +access+r +prog_path=/home/eric/Documents/VLSI/Hw3/N26091530/./sim/prog1 )
